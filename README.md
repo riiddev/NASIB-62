@@ -34,6 +34,10 @@ src/styles/                    CSS game & intro
 ## Lawan komputer
 Satu pemain manusia melawan 1–3 AI. Pilih **STAF FRAKSI**, **ELIT KABINET**, atau **OLIGARKI NASIONAL**. Semua memulai dengan saldo setara; level mengubah heuristik strategi, bukan dadu atau bonus uang.
 
+## Catatan Remotion
+
+Intro 5 detik menggunakan Remotion Player dalam browser. Sebelum rilis publik atau penggunaan komersial, tinjau ketentuan lisensi Remotion yang berlaku untuk skala penggunaan proyek ini. Render MP4 belum termasuk dalam repo.
+
 ## Audio
 Efek lokal berbasis Web Audio API; ambience kota opsional. Voice memanfaatkan `SpeechSynthesis` ID jika ada di perangkat. Browser memerlukan interaksi pertama sebelum audio boleh aktif.
 

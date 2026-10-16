@@ -1484,8 +1484,8 @@ const AI_LEVELS = {staff:{label:'STAF FRAKSI',subtitle:'Analisis dasar · adapta
 const AI_NAMES={staff:['Staf Anggaran','Birokrat Muda','Komite Daerah'],cabinet:['Sekretaris Kabinet','Komisaris Utama','Menteri Aset'],oligarch:['Konsorsium Utama','Pemodal Nasional','Pengendali Pasar']};
 let aiTimer=null, aiScheduleToken=0, aiRunning=false;
 function setupNameFields(prefill = null) {
-  $('#playerCountSeg button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.n) === setupState.count)));
-  $('#aiDifficultySeg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.difficulty === setupState.difficulty)));
+  $$('#playerCountSeg button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.n) === setupState.count)));
+  $$('#aiDifficultySeg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.difficulty === setupState.difficulty)));
   const humanName = (prefill && prefill[0]) || ($('#playerName0') && $('#playerName0').value) || DEFAULT_NAMES[0];
   $('#nameFields').innerHTML = '<div class="name-field"><label class="field-label" for="playerName0">NAMA PEMAIN · KAMU</label><div class="name-row">' + standeeHTML(0, PLAYER_COLORS[0].color) + '<input class="input name-input" id="playerName0" maxlength="18" value="' + escapeHTML(humanName) + '" placeholder="Nama panggilan" autocomplete="off"></div></div>';
   const profile = AI_LEVELS[setupState.difficulty];
