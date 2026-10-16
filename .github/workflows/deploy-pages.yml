@@ -38,6 +38,7 @@ jobs:
           set -e
           rm -f assets/index-*.js assets/index-*.css assets/app-*.js assets/app-*.css assets/realtime-*.js assets/IntroOverlay-*.js
           cp dist/index.html index.html
+          mkdir -p assets
           cp dist/assets/* assets/
           touch .nojekyll
           git config user.name "github-actions[bot]"
