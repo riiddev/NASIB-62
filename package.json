@@ -7,11 +7,13 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node --check src/legacy/engine.js",
+    "check": "node scripts/check-engine-patch.mjs",
     "build:pages": "npm run build"
   },
   "dependencies": {
     "@remotion/player": "^4.0.528",
+    "@supabase/supabase-js": "^2.118.0",
+    "diff": "^8.0.4",
     "gsap": "^3.15.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

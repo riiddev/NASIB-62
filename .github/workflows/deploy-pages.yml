@@ -29,6 +29,9 @@ jobs:
       - name: Check game engine syntax
         run: npm run check
       - name: Build production site
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
       - name: Prepare Pages artifact
         run: node scripts/prepare-pages.mjs

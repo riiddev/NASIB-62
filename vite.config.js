@@ -1,9 +1,29 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { applyPatch } from 'diff';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const enginePatch = readFileSync(resolve(process.cwd(), 'src/online/engine.patch'), 'utf8');
+
+function nasibEnginePatch() {
+  return {
+    name: 'nasib-legacy-engine-patch',
+    enforce: 'pre',
+    transform(source, id) {
+      if (!id.replaceAll('\\\\', '/').endsWith('/src/legacy/engine.js')) return null;
+      const transformed = applyPatch(source, enginePatch);
+      if (typeof transformed !== 'string') {
+        throw new Error('NASIB +62 engine patch failed to apply. Check src/online/engine.patch against src/legacy/engine.js.');
+      }
+      return { code: transformed, map: null };
+    },
+  };
+}
 
 export default defineConfig({
   base: './',
-  plugins: [react()],
+  plugins: [react(), nasibEnginePatch()],
   server: { host: '0.0.0.0' },
   build: { target: 'es2022', sourcemap: false },
 });

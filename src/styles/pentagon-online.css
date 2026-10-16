@@ -1,0 +1,69 @@
+/* NASIB +62 pentagonal board + online room controls */
+/* Five-sided board foundation; these rules intentionally override the old square grid. */
+.board-wrap{position:relative;container-type:inline-size;width:100%;max-width:min(920px,calc(100vh - 110px));margin:0 auto;isolation:isolate}
+.board{position:relative;display:block;aspect-ratio:1;overflow:visible;padding:0;clip-path:polygon(50% 1%,97% 33%,79% 96%,21% 96%,3% 33%);background:linear-gradient(145deg,#0d1020 0%,#22294a 45%,#11162c 100%);box-shadow:0 34px 70px -18px rgba(0,0,0,.72),inset 0 0 70px rgba(0,0,0,.65)}
+.board::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 1px,transparent 1px 8px);opacity:.32;pointer-events:none}
+.board-core{position:absolute;left:22.7%;top:24%;width:54.6%;height:51.5%;overflow:hidden;clip-path:polygon(50% 0%,96% 32%,78% 100%,22% 100%,4% 32%);border-radius:0;background:#161b34;box-shadow:0 0 0 2px rgba(244,196,48,.35),inset 0 0 0 1px rgba(255,255,255,.12)}
+.tile{position:absolute;left:50%;top:50%;width:var(--tile-w,9%);height:var(--tile-h,12.8%);display:flex;flex-direction:column;border-radius:clamp(3px,.5cqw,7px);overflow:hidden;background:var(--paper);color:var(--ink);text-align:left;container-type:size;box-shadow:0 2px 0 rgba(0,0,0,.35),0 8px 14px -8px rgba(0,0,0,.6);transform:translate(-50%,-50%) rotate(var(--tile-angle,0deg));transform-origin:center;transition:filter var(--d-mid) var(--ease-out),box-shadow var(--d-mid) var(--ease-out);cursor:pointer;min-width:0;min-height:0;-webkit-tap-highlight-color:transparent;z-index:2}
+.tile:hover{transform:translate(-50%,-50%) rotate(var(--tile-angle,0deg)) scale(1.055);z-index:7;filter:brightness(1.08);box-shadow:0 14px 24px -8px rgba(0,0,0,.7)}
+.tile.is-current{z-index:6;box-shadow:0 0 0 2px var(--yellow),0 0 18px 3px rgba(244,196,48,.65),0 10px 18px -6px rgba(0,0,0,.7)}
+@media(max-width:700px){.board-wrap{max-width:100%}.tile .thumb{display:none}.tile.prop .thumb{display:block;flex:0 0 30%;min-height:0}.tile.prop .thumb svg{display:none}.tile.prop .thumb img[data-photo]{display:block}.tile .meta{padding:4% 7% 5%}}
+
+.board .core-ui{padding:clamp(5px,1.1cqw,14px);gap:clamp(3px,1.1cqw,12px)}
+.board .core-title{font-size:clamp(19px,4.6cqw,48px)}
+.board .core-status{max-width:94%;font-size:clamp(9px,1.35cqw,14px)}
+.board .dice-stage{min-width:70%;height:clamp(46px,8.8cqw,92px);gap:clamp(9px,2cqw,24px)}
+.board .core-actions{gap:5px}
+.board .core-actions .btn{min-height:clamp(30px,4.6cqw,47px);padding:0 clamp(8px,1.5cqw,17px)}
+.tile .band{height:10%;min-height:3px}
+.tile .thumb{flex:1 1 42%;min-height:0}
+.tile .meta{padding:3% 5% 4%;gap:1px}
+.tile .nm{font-size:clamp(6px,12cqh,13px);line-height:.98;white-space:normal;overflow-wrap:anywhere}
+.tile .sub{font-size:clamp(5px,7.5cqh,9px);line-height:1;white-space:normal}
+.tile .pr{font-size:clamp(6px,8.7cqh,10px);line-height:1.05}
+.tile .own .dot{width:clamp(5px,11cqw,12px);height:clamp(5px,11cqw,12px)}
+.tile .thumb img[data-photo]{filter:saturate(.92) contrast(1.04)}
+.tile .thumb img[data-photo]::after{content:none}
+
+.online-entry{font:800 13px var(--font-ui);display:inline-flex;align-items:center;gap:8px;padding:0 14px;min-height:42px;border:1px solid rgba(18,22,42,.18);border-radius:999px;background:#f4c430;color:#12162a;white-space:nowrap;transition:transform .18s ease,box-shadow .18s ease}
+.online-entry:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(18,22,42,.14)}
+.hero-actions .online-entry{min-height:48px}
+.online-modal-backdrop{position:fixed;inset:0;z-index:150;background:rgba(8,11,23,.72);backdrop-filter:blur(10px);display:grid;place-items:center;padding:18px;overflow:auto}
+.online-modal{width:min(680px,100%);max-height:min(90vh,900px);overflow:auto;background:#f7f5ef;color:#12162a;border:1px solid rgba(255,255,255,.7);border-radius:18px;box-shadow:0 35px 100px rgba(0,0,0,.45);padding:clamp(18px,3vw,32px);position:relative}
+.online-modal h2{font:900 clamp(30px,5vw,44px)/.95 var(--font-display);letter-spacing:-.02em;margin:10px 0}
+.online-modal .eyebrow{font:900 10px var(--font-ui);letter-spacing:.18em;text-transform:uppercase;color:#c64c34}
+.online-modal .lede{color:#65697a;font-size:13px;line-height:1.55;margin:10px 0 20px}
+.online-close{position:absolute;top:13px;right:13px;border:0;border-radius:50%;background:#e8e6dc;color:#12162a;width:36px;height:36px;font-size:24px;line-height:1}
+.online-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.online-field{display:grid;gap:6px;margin:0 0 12px;min-width:0}
+.online-field label{font:900 10px var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:#606579}
+.online-field input{width:100%;min-width:0;border:1px solid #d2d0c8;background:#fffdf7;border-radius:9px;min-height:44px;padding:10px 12px;color:#12162a;outline:none}
+.online-field input:focus{border-color:#c6a15b;box-shadow:0 0 0 3px rgba(198,161,91,.17)}
+.online-help{font-size:11px;line-height:1.5;color:#777b8b;margin:2px 0 14px}
+.online-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}
+.online-actions .btn{flex:1;min-width:150px}
+.online-statusline{padding:11px 13px;border-radius:9px;background:#e9e7df;color:#555a6a;font-size:12px;line-height:1.5;margin:10px 0}
+.online-statusline[data-kind=error]{background:#fae2dd;color:#9b3027}
+.online-statusline[data-kind=success]{background:#deeee2;color:#235b3d}
+.online-room-code{font:900 clamp(30px,8vw,46px)/1 var(--font-display);letter-spacing:.16em;color:#12162a;background:#f4c430;border-radius:12px;padding:15px;text-align:center;margin:10px 0 14px;user-select:all}
+.online-roster{display:grid;gap:7px;margin:12px 0}
+.online-roster-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fffdf7;border:1px solid #d9d7ce;border-radius:9px}
+.online-roster-num{font:900 20px var(--font-display);width:24px;color:#c64c34}
+.online-roster-name{font-size:13px;font-weight:800;flex:1;min-width:0}
+.online-roster-label{font-size:9px;font-weight:900;letter-spacing:.08em;color:#777b8b}
+.online-led{width:8px;height:8px;border-radius:50%;background:#47a876;box-shadow:0 0 0 4px rgba(71,168,118,.12)}
+.online-game-dock{position:fixed;z-index:70;right:18px;top:78px;width:min(320px,calc(100vw - 28px));color:#f7f5ef;background:rgba(18,22,42,.95);border:1px solid rgba(255,255,255,.16);border-radius:14px;box-shadow:0 18px 55px rgba(0,0,0,.32);backdrop-filter:blur(15px);overflow:hidden}
+.online-game-head{display:flex;align-items:center;gap:9px;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.1)}
+.online-game-head strong{font:900 17px var(--font-display);letter-spacing:.06em;color:#f4c430;flex:1}
+.online-code-small{font:800 10px var(--font-ui);letter-spacing:.12em;color:rgba(255,255,255,.7)}
+.online-game-buttons{display:flex;gap:6px;padding:8px 11px}
+.online-mini-btn{border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:7px 9px;font:800 10px var(--font-ui);color:#f7f5ef;background:rgba(255,255,255,.06)}
+.online-chat{padding:0 11px 11px}
+.online-chat-list{max-height:180px;overflow:auto;display:grid;gap:7px;padding:8px 1px}
+.online-chat-message{font-size:11px;line-height:1.4;color:rgba(255,255,255,.84);overflow-wrap:anywhere}
+.online-chat-message b{color:#f4c430;margin-right:5px}
+.online-chat-form{display:flex;gap:6px}
+.online-chat-form input{min-width:0;flex:1;border:1px solid rgba(255,255,255,.18);border-radius:7px;background:rgba(255,255,255,.08);color:#fff;padding:9px 10px;outline:none;font-size:12px}
+.online-chat-form button{border:0;border-radius:7px;background:#f4c430;color:#12162a;font:900 11px var(--font-ui);padding:0 12px}
+.online-hidden{display:none!important}
+@media(max-width:700px){.online-modal-backdrop{padding:10px}.online-modal{border-radius:14px;padding:18px;max-height:94vh}.online-grid{grid-template-columns:1fr;gap:0}.online-game-dock{top:auto;bottom:14px;right:10px;width:min(306px,calc(100vw - 20px));}.online-chat-list{max-height:115px}.online-entry{padding:0 10px;font-size:11px;min-height:38px}.nav #navOnline{display:none}.tile .nm{font-size:clamp(5px,10.2cqh,10px)}.tile .pr{font-size:clamp(5px,7.5cqh,8px)}.tile.prop .thumb{flex-basis:28%}.tile.prop .meta{padding:2% 4% 3%}}

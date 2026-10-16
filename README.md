@@ -50,3 +50,12 @@ Efek lokal berbasis Web Audio API; ambience kota opsional. Voice memanfaatkan `S
 
 ## Batasan migrasi
 Untuk menghindari rewrite berisiko, engine game masih menggunakan DOM selector yang ada. Markup dipisah menjadi beberapa fragment HTML dan di-compose oleh React; ini adalah tahap migrasi, belum konversi penuh semua interaksi ke komponen/state React.
+
+
+## Gajian, papan pentagonal, dan mabar
+- Gaji saat melewati/berhenti di START adalah **Rp1.000.000**. `src/online/engine.patch` menjaga perubahan perilaku game terisolasi dari modul legacy; Vite memvalidasi dan menerapkan patch itu pada development serta build. Saldo awal permainan tetap Rp15.000.000.
+- Papan 28 kotak kini disusun mengikuti keliling segi lima.
+- Semua 15 kota memiliki foto sungguhan dengan kredit dan halaman lisensi Wikimedia Commons di panel kredit/panduan. Jika sumber foto gagal dimuat, tile memiliki ilustrasi fallback.
+- Mabar memakai Supabase Realtime (presence + broadcast) dengan host sebagai pemegang state game; tidak perlu akun pemain. Untuk menanam koneksi ke website publik, buat Supabase project, ambil Project URL serta anon/publishable key, lalu tambahkan GitHub repository Variables `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY`. Jalankan workflow deploy setelah variables tersedia. Jangan pernah memakai `service_role` key di browser. Tanpa values tersebut, fitur lobby tetap tampil namun tidak dapat terhubung ke room realtime.
+
+Panduan pengaktifan realtime: [`docs/ONLINE_MULTIPLAYER.md`](docs/ONLINE_MULTIPLAYER.md).
