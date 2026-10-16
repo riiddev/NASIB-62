@@ -1,8 +1,11 @@
-// The mini-window belongs only to the actual game dashboard. Landing-page
-// navigation (Fitur, Cara main, Wilayah, Panduan, Mabar) keeps normal behavior.
+// Mini-preview is intentionally limited to the five landing-page navigation
+// items. Never attach it to in-game controls, tiles, modals, or other buttons.
 const TARGET_SELECTOR = [
-  '#game button',
-  '#game .tile[data-tile]',
+  '#siteHeader .nav a[href="#fitur"]',
+  '#siteHeader .nav a[href="#cara-main"]',
+  '#siteHeader .nav a[href="#wilayah"]',
+  '#siteHeader #navGuide',
+  '#siteHeader #navOnline',
 ].join(',');
 
 const ACTION_PREVIEWS = {
