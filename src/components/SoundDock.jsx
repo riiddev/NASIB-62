@@ -1,0 +1,8 @@
+import React, { useState } from 'react';
+import { NasibAudio } from '../audio/audio.js';
+export default function SoundDock() {
+ const [sfx, setSfx] = useState(true), [voice, setVoice] = useState(true), [ambience, setAmbience] = useState(false), [volume, setVolume] = useState(.65), [collapsed, setCollapsed] = useState(false);
+ const configure = (next) => NasibAudio.configure(next);
+ const makeButton = (label, pressed, onClick) => <button className="sound-toggle" type="button" aria-pressed={pressed} onClick={onClick}>{label}</button>;
+ return <aside className={'sound-dock ' + (collapsed ? 'is-collapsed' : '')} aria-label="Pengaturan suara"><div className="sound-dock-head"><span className="sound-dock-label">AUDIO CONTROL</span><button className="sound-toggle" type="button" aria-expanded={!collapsed} onClick={() => setCollapsed(!collapsed)}>{collapsed ? 'Buka +' : 'Sembunyikan −'}</button></div>{!collapsed && <><div className="sound-dock-toggles">{makeButton('SFX ' + (sfx ? 'ON' : 'OFF'), sfx, () => { setSfx(!sfx); configure({ sfxEnabled: !sfx }); })}{makeButton('SUARA ' + (voice ? 'ON' : 'OFF'), voice, () => { setVoice(!voice); configure({ voiceEnabled: !voice }); })}{makeButton('KOTA ' + (ambience ? 'ON' : 'OFF'), ambience, () => { setAmbience(!ambience); configure({ ambienceEnabled: !ambience }); })}</div><label className="sound-dock-volume"><span>MASTER</span><input type="range" min="0" max="1" step=".05" value={volume} onChange={(event) => { const value = Number(event.target.value); setVolume(value); configure({ volume: value }); }}/><span>{Math.round(volume * 100)}%</span></label><p className="sound-dock-note">Audio aktif setelah interaksi pertama. Voice karakter memakai bahasa Indonesia yang tersedia di perangkat.</p></>}</aside>;
+}
