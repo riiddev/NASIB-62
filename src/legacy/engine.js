@@ -91,11 +91,11 @@ const MISHAP_CARDS = [
 
 // Embedded illustration crops from the project's own hero artwork (data URLs, no external dependency).
 const IMG = {
-  hero: '/assets/nasib-art-02.webp',
-  monas: '/assets/nasib-art-03.webp', toll: '/assets/nasib-art-04.webp', houses: '/assets/nasib-art-05.webp', docs: '/assets/nasib-art-06.webp',
-  traffic: '/assets/nasib-art-07.webp', money: '/assets/nasib-art-01.webp', dice: '/assets/nasib-art-08.webp', vendor: '/assets/nasib-art-09.webp',
-  man: '/assets/nasib-art-10.webp', calc: '/assets/nasib-art-11.webp',
-  cover: '/assets/nasib-art-12.webp', cards: '/assets/nasib-art-13.webp', pawn: '/assets/nasib-art-14.webp', board: '/assets/nasib-art-15.webp', card: '/assets/nasib-art-16.webp',
+  hero: './assets/nasib-art-02.webp',
+  monas: './assets/nasib-art-03.webp', toll: './assets/nasib-art-04.webp', houses: './assets/nasib-art-05.webp', docs: './assets/nasib-art-06.webp',
+  traffic: './assets/nasib-art-07.webp', money: './assets/nasib-art-01.webp', dice: './assets/nasib-art-08.webp', vendor: './assets/nasib-art-09.webp',
+  man: './assets/nasib-art-10.webp', calc: './assets/nasib-art-11.webp',
+  cover: './assets/nasib-art-12.webp', cards: './assets/nasib-art-13.webp', pawn: './assets/nasib-art-14.webp', board: './assets/nasib-art-15.webp', card: './assets/nasib-art-16.webp',
 };
 
 // Which embedded crop represents each special tile type.

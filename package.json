@@ -7,7 +7,8 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node --check src/legacy/engine.js"
+    "check": "node --check src/legacy/engine.js",
+    "build:pages": "npm run build"
   },
   "dependencies": {
     "@remotion/player": "^4.0.528",

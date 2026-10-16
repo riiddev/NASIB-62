@@ -38,6 +38,10 @@ Satu pemain manusia melawan 1–3 AI. Pilih **STAF FRAKSI**, **ELIT KABINET**, a
 
 Intro 5 detik menggunakan Remotion Player dalam browser. Sebelum rilis publik atau penggunaan komersial, tinjau ketentuan lisensi Remotion yang berlaku untuk skala penggunaan proyek ini. Render MP4 belum termasuk dalam repo.
 
+## GitHub Pages deployment
+
+The app is built by Vite and the workflow in `.github/workflows/deploy-pages.yml` uploads the compiled `dist/` artifact. To activate it once, open the repository **Settings → Pages → Build and deployment → Source** and select **GitHub Actions**. The repository integration cannot alter this setting automatically. Vite uses relative URLs (`base: './'`) so the `/NASIB-62/` project path is respected.
+
 ## Audio
 Efek lokal berbasis Web Audio API; ambience kota opsional. Voice memanfaatkan `SpeechSynthesis` ID jika ada di perangkat. Browser memerlukan interaksi pertama sebelum audio boleh aktif.
 
