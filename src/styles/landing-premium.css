@@ -26,7 +26,7 @@
   --l-line:rgba(16,21,40,.12);
   --l-red:#CF3A2E;
   --l-sky:#F4E6BD;
-  --l-gutter:max(clamp(20px,6vw,96px),calc((100% - 1240px) / 2));
+  --l-gutter:max(clamp(20px,6vw,96px),calc((100% - 1840px) / 2));
   --font-display:'Bricolage Grotesque','Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
  
@@ -396,4 +396,15 @@ html.lenis,html.lenis body{height:auto}
   #landing .credits>div:nth-child(3){grid-area:tech}
   #landing #photoCredits{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
   #landing .fine{margin-top:14px}
+}
+
+
+/* Responsive wide-screen correction: don't trap landing content in a narrow
+   1240px column when the user has a wide monitor or browser zoom is reduced. */
+@media(min-width:821px){
+  #landing .hero-inner{padding:clamp(108px,12vh,150px) var(--l-gutter) 64px}
+  #landing .hero-copy{max-width:min(1320px,82vw)}
+  #landing .hero h1{font-size:clamp(44px,min(5.4vw,8.6vh),96px);line-height:.98;letter-spacing:-.045em}
+  #landing .hero-sub{max-width:56ch}
+  #landing .hero-art{width:66%;object-position:72% 58%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 44%);mask-image:linear-gradient(90deg,transparent 0,#000 44%)}
 }
