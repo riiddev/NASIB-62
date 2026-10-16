@@ -1,9 +1,8 @@
+// The mini-window belongs only to the actual game dashboard. Landing-page
+// navigation (Fitur, Cara main, Wilayah, Panduan, Mabar) keeps normal behavior.
 const TARGET_SELECTOR = [
-  '#siteHeader button',
-  '#siteHeader a[href^="#"]',
-  '#landing button',
-  '#landing a[href^="#"]',
   '#game button',
+  '#game .tile[data-tile]',
 ].join(',');
 
 const ACTION_PREVIEWS = {
