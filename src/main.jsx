@@ -5,4 +5,5 @@ import './styles/main.css';
 import './styles/intro.css';
 import './styles/pentagon-online.css';
 import './styles/landing-premium.css';
+import './styles/dashboard-preview.css';
 createRoot(document.getElementById('root')).render(<App />);
