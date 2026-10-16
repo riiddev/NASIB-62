@@ -1,17 +1,32 @@
 diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 --- a/src/legacy/engine.js
 +++ b/src/legacy/engine.js
-@@ -11,2 +11,2 @@
+@@ -8,8 +8,8 @@
+    Game numbers, board, and cards are copied unchanged from the
+    original NASIB +62 source. Only presentation data is added.
+    ========================================================= */
 -const STARTING_MONEY = 15_000_000;
 -const START_SALARY = 2_000_000;
 +const STARTING_MONEY = 10_000_000;
 +const START_SALARY = 1_000_000;
-@@ -71,0 +72,4 @@
+ const JAIL_BAIL = 1_000_000;
+ const HOUSE_COST = 1_000_000;
+ const MAX_HOUSES = 3;               // canBuildAtCurrent() allows building while houses < 3
+@@ -69,6 +69,10 @@
+   { title: 'CUTI DISETUJUI', text: 'Kamu bisa rehat dari hiruk-pikuk. Maju 2 langkah.', kind: 'move', amount: 2, icon: '🏖️' },
+   { title: 'ANTRIAN BERKAS', text: 'Berkasmu tertahan. Masuk lapas administrasi.', kind: 'jail', icon: '🗃️' },
+   { title: 'BONUS KOLABORASI', text: 'Teman tim membayar bagianmu yang tertunda.', kind: 'gain', amount: 400_000, icon: '🙌' },
 +  { title: 'UMKM LAGI RAMAI', text: 'Pesanan dagangan dan katering sedang ramai. Ada pemasukan tambahan.', kind: 'gain', amount: 900_000, icon: '🛍️' },
 +  { title: 'BEASISWA CAIR', text: 'Bantuan pendidikan meringankan beberapa kebutuhanmu bulan ini.', kind: 'gain', amount: 750_000, icon: '🎓' },
 +  { title: 'GOTONG ROYONG', text: 'Tetangga urunan membantu memperbaiki rumah. Pengeluaran jadi lebih ringan.', kind: 'gain', amount: 350_000, icon: '🏘️' },
 +  { title: 'KONTRAK DIPERPANJANG', text: 'Kontrak kerja diperpanjang satu periode lagi. Kamu bisa bernapas lega.', kind: 'gain', amount: 600_000, icon: '📝' },
-@@ -87 +91,7 @@
+ ];
+ 
+ const MISHAP_CARDS = [
+@@ -84,7 +88,13 @@
+   { title: 'KELUARGA DATANG', text: 'Traktir makan satu rombongan.', kind: 'lose', amount: 650_000, icon: '🍲' },
+   { title: 'GAJI TELAT', text: 'Potong pengeluaran dan bayar biaya keterlambatan.', kind: 'lose', amount: 600_000, icon: '⏰' },
+   { title: 'SANKSI BERKAS', text: 'Masuk ruang tunggu administrasi sampai urusan selesai.', kind: 'jail', icon: '📂' },
 -  { title: 'TANAH DISITA NEGARA', text: 'Lahanmu masuk jalur proyek tol. Jika punya properti, yang termahal disita dan berubah jadi kotak tol.', kind: 'seize', icon: '🛣️' },
 +  { title: 'BANJIR MASUK RUMAH', text: 'Air naik setelah hujan deras. Kamu harus membersihkan rumah dan mengganti barang yang rusak.', kind: 'lose', amount: 800_000, icon: '🌧️' },
 +  { title: 'KENA PHK', text: 'Kontrak kerja diputus mendadak. Dana darurat terpakai untuk kebutuhan penting.', kind: 'lose', amount: 1_200_000, icon: '📦' },
@@ -20,7 +35,13 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +  { title: 'TAGIHAN LISTRIK MEMBENGKAK', text: 'Pemakaian bulan ini melonjak. Tagihan datang sebelum gajian.', kind: 'lose', amount: 350_000, icon: '💡' },
 +  { title: 'ONGKOS KOMUTER NAIK', text: 'Perjalanan kerja lebih mahal minggu ini. Saldo transportasi terkuras.', kind: 'lose', amount: 300_000, icon: '🚌' },
 +  { title: 'PENGGUSURAN PROYEK TOL', text: 'Dalam simulasi ini, lahan termahal milikmu terkena proyek jalan tol dan disita. Jika tak punya tanah, kamu tetap menanggung biaya.', kind: 'seize', icon: '🚧' },
-@@ -109,6 +119,15 @@
+ ];
+ 
+ /* ---- Presentation data (new) ---- */
+@@ -106,12 +116,21 @@
+    blocked, moved), the tile automatically keeps its illustrated art. To add more photos,
+    add one entry here with the file's Commons page, author and license. */
+ const CITY_PHOTOS = {
 -  Jakarta: {
 -    src: 'https://commons.wikimedia.org/wiki/Special:FilePath/Jakarta_Panorama.jpg?width=640',
 -    page: 'https://commons.wikimedia.org/wiki/File:Jakarta_Panorama.jpg',
@@ -42,7 +63,13 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +  Palembang: { src: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Ampera_Bridge%2C_Palembang.jpg/500px-Ampera_Bridge%2C_Palembang.jpg', page: 'https://commons.wikimedia.org/wiki/File:Ampera_Bridge,_Palembang.jpg', title: 'Jembatan Ampera, Palembang', author: 'Achmad Rabin Taim', license: 'CC BY 2.0' },
 +  Manokwari: { src: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/City_of_Manokwari.jpg/500px-City_of_Manokwari.jpg', page: 'https://commons.wikimedia.org/wiki/File:City_of_Manokwari.jpg', title: 'Kota Manokwari', author: 'David Worabay', license: 'CC BY-SA 3.0' },
 +  Banjarmasin: { src: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Banjarmasin_Montage.jpg/500px-Banjarmasin_Montage.jpg', page: 'https://commons.wikimedia.org/wiki/File:Banjarmasin_Montage.jpg', title: 'Kolase landmark dan pasar terapung Banjarmasin', author: 'Beragam kontributor; lihat halaman file', license: 'CC BY-SA 3.0' },
-@@ -235,9 +254,29 @@
+ };
+ 
+ const REGION_ORDER = ['Papua', 'Kalimantan', 'Sulawesi', 'Sumatra', 'Jawa'];
+@@ -232,15 +251,35 @@
+     <rect y="76" width="200" height="24" fill="${ground}"/>${lm}
+   </svg>`;
+ }
 -function cardArtSVG(type) {
 -  if (type === 'fate') return `<svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><rect width="200" height="120" fill="#1e4c9d"/>
 -    <g fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" opacity=".95"><g transform="translate(46 30) rotate(-12 28 28)"><rect width="56" height="56" rx="10"/><circle cx="16" cy="16" r="3.4" fill="#fff"/><circle cx="40" cy="40" r="3.4" fill="#fff"/><circle cx="28" cy="28" r="3.4" fill="#fff"/></g><g transform="translate(112 44) rotate(14 24 24)"><rect width="48" height="48" rx="9"/><circle cx="14" cy="14" r="3" fill="#fff"/><circle cx="34" cy="14" r="3" fill="#fff"/><circle cx="14" cy="34" r="3" fill="#fff"/><circle cx="34" cy="34" r="3" fill="#fff"/></g></g>
@@ -61,7 +88,6 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +    flood: `<g><path d="M0 94Q20 83 40 94T80 94T120 94T160 94T200 94T260 94V160H0Z" fill="#4aa6ca"/><path d="M0 111Q20 100 40 111T80 111T120 111T160 111T200 111T260 111" fill="none" stroke="#b1eff2" stroke-width="5"/><path d="M35 101V62L73 38 111 62V101Z" fill="#f5c87e" stroke="#512d2d" stroke-width="4"/><path d="M26 64 73 29 120 64" fill="#b94a3d" stroke="#512d2d" stroke-width="5"/><rect x="65" y="75" width="18" height="26" fill="#67413b"/><rect x="44" y="68" width="13" height="13" fill="#9bdcf5"/><path d="M145 100V73L174 55 202 73V100Z" fill="#f4b975" stroke="#512d2d" stroke-width="3"/><path d="M137 73 174 48 210 73" fill="#bd6550" stroke="#512d2d" stroke-width="4"/><g stroke="#d8f1ff" stroke-width="4" stroke-linecap="round"><path d="M31 10 22 29M67 5 58 24M104 14 95 33M155 6 146 25M196 11 187 30M229 2 220 21"/></g><path d="M122 104 128 88 134 104 128 111Z" fill="#ffe07c"/></g>`,
 +    work: `<g><rect x="22" y="18" width="76" height="103" rx="5" fill="#b7d5e3" stroke="#253755" stroke-width="4"/><g fill="#4a7c9c"><rect x="34" y="30" width="15" height="14" rx="2"/><rect x="58" y="30" width="15" height="14" rx="2"/><rect x="34" y="54" width="15" height="14" rx="2"/><rect x="58" y="54" width="15" height="14" rx="2"/><rect x="34" y="78" width="15" height="14" rx="2"/><rect x="58" y="78" width="15" height="14" rx="2"/></g><path d="M0 122H260" stroke="#f8d9a1" stroke-width="5"/><circle cx="151" cy="44" r="16" fill="#c77d55"/><path d="M132 40q20-31 40 0" fill="#29263b"/><path d="M130 65 171 65 181 115 120 115Z" fill="#f3c65f" stroke="#45334a" stroke-width="4"/><path d="M133 74 113 101M169 75 189 99" stroke="#c77d55" stroke-width="10" stroke-linecap="round"/><rect x="178" y="88" width="38" height="28" rx="3" fill="#bd9065" stroke="#684536" stroke-width="3"/><path d="M188 88v-7h18v7" fill="none" stroke="#684536" stroke-width="4"/><path d="M133 115 126 134M164 115 174 134" stroke="#28344f" stroke-width="12" stroke-linecap="round"/><path d="M196 24h43M196 35h28" stroke="#ffcc83" stroke-width="5" stroke-linecap="round"/></g>`,
 +    bill: `<g><path d="M28 20H150L164 35V130H28Z" fill="#fff0cd" stroke="#34243a" stroke-width="4"/><path d="M150 20V36H164" fill="#f6c768" stroke="#34243a" stroke-width="3"/><path d="M45 50H137M45 65H125M45 80H103" stroke="#8f8a98" stroke-width="5" stroke-linecap="round"/><rect x="45" y="96" width="78" height="21" rx="4" fill="#c94d3b"/><path d="M183 47 209 47 209 72 225 72 192 106 192 81 176 81Z" fill="#f7c74e" stroke="#4d2b32" stroke-width="4" stroke-linejoin="round"/><circle cx="202" cy="27" r="14" fill="#e95d50" stroke="#fff1cf" stroke-width="3"/><path d="M202 18v10M202 34v1" stroke="#fff1cf" stroke-width="4" stroke-linecap="round"/></g>`,
-+    traffic: `<g><path d="M0 105 260 75V160H0Z" fill="#343c53"/><path d="M0 137 260 111" stroke="#fff1c7" stroke-width="4" stroke-dasharray="16="M183 47 209 47 209 72 225 72 192 106 192 81 176 81Z" fill="#f7c74e" stroke="#4d2b32" stroke-width="4" stroke-linejoin="round"/><circle cx="202" cy="27" r="14" fill="#e95d50" stroke="#fff1cf" stroke-width="3"/><path d="M202 18v10M202 34v1" stroke="#fff1cf" stroke-width="4" stroke-linecap="round"/></g>`,
 +    traffic: `<g><path d="M0 105 260 75V160H0Z" fill="#343c53"/><path d="M0 137 260 111" stroke="#fff1c7" stroke-width="4" stroke-dasharray="16 12"/><g transform="translate(20 62)"><path d="M0 25 10 6H61L75 25V52H0Z" fill="#e75d43" stroke="#3a2b42" stroke-width="4"/><path d="M17 10H39V25H9Z" fill="#a9dced"/><path d="M43 10H58L68 25H43Z" fill="#a9dced"/><circle cx="17" cy="51" r="9" fill="#212637" stroke="#c9d0d7" stroke-width="3"/><circle cx="59" cy="51" r="9" fill="#212637" stroke="#c9d0d7" stroke-width="3"/></g><g transform="translate(126 87) scale(.8)"><path d="M0 25 10 6H61L75 25V52H0Z" fill="#f0b945" stroke="#3a2b42" stroke-width="4"/><path d="M17 10H39V25H9Z" fill="#a9dced"/><path d="M43 10H58L68 25H43Z" fill="#a9dced"/><circle cx="17" cy="51" r="9" fill="#212637" stroke="#c9d0d7" stroke-width="3"/><circle cx="59" cy="51" r="9" fill="#212637" stroke="#c9d0d7" stroke-width="3"/></g><circle cx="213" cy="26" r="20" fill="#f8d064" stroke="#493046" stroke-width="4"/><path d="M213 14v13l9 6" stroke="#493046" stroke-width="4" fill="none" stroke-linecap="round"/></g>`,
 +    income: `<g><circle cx="212" cy="28" r="19" fill="#ffcc58"/><path d="M0 125H260" stroke="#f5dca3" stroke-width="4"/><path d="M25 125V53H140V125Z" fill="#f6cf7d" stroke="#49334a" stroke-width="4"/><path d="M18 57 81 24 147 57" fill="#c44e3e" stroke="#49334a" stroke-width="5"/><path d="M29 61H137" stroke="#fff2c7" stroke-width="8"/><path d="M29 61v19h18V61m18 0v19h18V61m18 0v19h18V61" fill="#3e9874"/><rect x="52" y="83" width="26" height="42" fill="#53758c" stroke="#49334a" stroke-width="3"/><rect x="87" y="83" width="34" height="22" fill="#96d5e8" stroke="#49334a" stroke-width="3"/><g transform="translate(163 63) rotate(9)"><rect width="59" height="38" rx="6" fill="#2b996e" stroke="#102e4d" stroke-width="4"/><rect x="0" y="9" width="59" height="9" fill="#80d69d"/><circle cx="43" cy="27" r="6" fill="#f7d264"/></g><g fill="#f7cf68" stroke="#6a4d33" stroke-width="3"><circle cx="181" cy="119" r="12"/><circle cx="207" cy="119" r="12"/></g></g>`,
 +    house: `<g><path d="M36 128V62L91 24 147 62V128Z" fill="#f4c982" stroke="#443047" stroke-width="5"/><path d="M24 66 91 14 159 66" fill="#bf4e42" stroke="#443047" stroke-width="6" stroke-linejoin="round"/><rect x="76" y="84" width="29" height="44" rx="3" fill="#5d4854"/><rect x="48" y="70" width="20" height="20" rx="2" fill="#9fdef0" stroke="#443047" stroke-width="3"/><rect x="116" y="70" width="20" height="20" rx="2" fill="#9fdef0" stroke="#443047" stroke-width="3"/><path d="M0 130H260" stroke="#d7e8bb" stroke-width="5"/><circle cx="199" cy="40" r="17" fill="#f7cd62"/><path d="M181 97h57v31h-57z" fill="#3c9870" stroke="#443047" stroke-width="4"/><path d="M190 111h39" stroke="#d7f5cd" stroke-width="3"/></g>`,
@@ -82,11 +108,23 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +function cardArtSVG(type, card = null) {
 +  const scene = cardScene(card, type);
 +  return sceneArtSVG(scene, type);
-@@ -301,0 +341,3 @@
+ }
+ function jailArtSVG() {
+   return `<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><rect width="200" height="100" fill="#4a5070"/><rect width="200" height="100" fill="#8a90ad" opacity=".25"/>${Array.from({ length: 9 }, (_, i) => `<rect x="${12 + i * 21}" y="0" width="8" height="100" fill="#1a1d30"/><rect x="${12 + i * 21}" y="0" width="2.6" height="100" fill="#6d7498"/>`).join('')}<rect y="40" width="200" height="8" fill="#1a1d30"/></svg>`;
+@@ -299,6 +338,9 @@
+   log: [], lastRollText: 'Giliranmu, lempar dadu.', started: false, stateSeized: new Set(),
+   runId: 0, // bumped on every new game; async work from an older game checks it and stops
+ };
 +let onlineMode = false;
 +let onlineSlot = 0;
 +let liveCard = null;
-@@ -325,6 +367,6 @@
+ 
+ /* The engine never touches the DOM. Everything visual goes through these hooks,
+    which the UI layer (sections 6-9) replaces at startup. */
+@@ -322,12 +364,12 @@
+   const members = BOARD.map((tile, index) => ({ tile, index })).filter(({ tile }) => tile.type === 'property' && tile.region === region);
+   return members.length > 0 && members.every(({ index }) => state.assets[index]?.ownerId === playerId);
+ }
 -function canBuildAtCurrent() {
 -  const player = getCurrentPlayer();
 -  const tile = BOARD[player?.pos];
@@ -99,16 +137,23 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +  return Boolean(state.awaiting && player?.alive && tile?.type === 'property' && asset?.ownerId === player.id && regionComplete(player.id, tile.region) && asset.houses < MAX_HOUSES);
 +}
 +function canBuildAtCurrent() { return canBuildOn(getCurrentPlayer()?.pos); }
-@@ -543 +585 @@
+ function rentFor(index) {
+   const tile = BOARD[index]; const asset = state.assets[index];
+   return Math.round(tile.rent * (1 + (asset ? asset.houses : 0) * 1.2));
+@@ -540,16 +582,17 @@
+   Hooks.announce(`${player.name} membeli ${tile.name} seharga ${money(tile.price)}.`);
+   Hooks.render();
+ }
 -function buildHouse() {
 +function buildHouse(index = getCurrentPlayer()?.pos) {
-@@ -545,2 +587,3 @@
+   const player = getCurrentPlayer();
 -  if (state.busy || !player?.alive || !canBuildAtCurrent() || player.money < HOUSE_COST) return;
 -  const tile = BOARD[player.pos];
 +  const target = Number.isInteger(index) ? index : player?.pos;
 +  if (state.busy || !player?.alive || !canBuildOn(target, player) || player.money < HOUSE_COST) return;
 +  const tile = BOARD[target];
-@@ -549,4 +592,4 @@
+   player.money -= HOUSE_COST;
+   window.NasibAudio?.play('build');
 -  state.assets[player.pos].houses += 1;
 -  addLog(`${player.name} membangun rumah di ${tile.name} seharga ${money(HOUSE_COST)}.`, 'good');
 -  Hooks.flashTile(player.pos);
@@ -117,16 +162,36 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +  addLog(`${player.name} membangun rumah di ${tile.name} seharga ${money(HOUSE_COST)}. Sewa dasarnya kini naik menjadi ${money(rentFor(target))}.`, 'good');
 +  Hooks.flashTile(target);
 +  Hooks.announce(`${player.name} membangun rumah di ${tile.name}. Sewa tanah ini meningkat.`);
-@@ -601 +644 @@
+   Hooks.render();
+ }
+ function continueTurn() {
+@@ -598,7 +641,7 @@
+   state.players = names.map((name, index) => ({
+     id: `p${index + 1}`, name: name.slice(0, 18), token: PLAYER_COLORS[index].token,
+     color: PLAYER_COLORS[index].color, money: STARTING_MONEY, pos: 0,
 -    jailed: false, jailTurns: 0, alive: true, isAI: index > 0, aiDifficulty: setupState.difficulty,
 +    jailed: false, jailTurns: 0, alive: true, isAI: onlineMode ? false : index > 0, aiDifficulty: setupState.difficulty,
-@@ -621 +664 @@
+   }));
+   state.current = 0; state.turnCount = 0; state.round = 1;
+   state.assets = BOARD.map((tile) => tile.type === 'property' ? { ownerId: null, houses: 0 } : null);
+@@ -618,11 +661,11 @@
+   state.awaiting = true;
+   Hooks.render();
+ }
 -function handleAction(action) {
 +function handleAction(action, targetIndex) {
-@@ -625 +668 @@
+   if (action === 'roll') rollDice();
+   else if (action === 'buy') buyProperty();
+   else if (action === 'skip-buy') { if (!state.busy) { state.pendingBuy = null; Hooks.render(); } }
 -  else if (action === 'build') buildHouse();
 +  else if (action === 'build') buildHouse(Number.isInteger(targetIndex) ? targetIndex : undefined);
-@@ -651,7 +694,27 @@
+   else if (action === 'continue') continueTurn();
+   else if (action === 'bail') payBail();
+ }
+@@ -648,13 +691,33 @@
+   boardBuilt: false,
+   moveChain: Promise.resolve(),
+ };
 -const BOARD_COORDS = (() => {
 -  const c = [];
 -  for (let col = 1; col <= 8; col++) c.push([1, col]);
@@ -161,16 +226,31 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +    }
 +  }
 +  return result;
-@@ -671 +734 @@
+ })();
+ const tileAccent = (type) => ({ start: '#e3ad2f', fate: '#2b63c4', mishap: '#e0572a', jail: '#686d7e', tax: '#c6a15b', toll: '#c6a15b', tilang: '#d86c55', pungli: '#c6a15b', court: '#c6a15b', property: '#58a273' })[type] || '#d7cdb7';
+ const tileLabel = (tile) => (tile.type === 'fate' || tile.type === 'mishap') ? tile.name.replace('KARTU ', '') : tile.name;
+@@ -668,12 +731,15 @@
+   $$('.tile', board).forEach((n) => n.remove());
+   const frag = document.createDocumentFragment();
+   BOARD.forEach((tile, index) => {
 -    const [row, col] = BOARD_COORDS[index];
 +    const layout = BOARD_LAYOUT[index];
-@@ -676 +739,4 @@
+     const el = document.createElement('button');
+     el.type = 'button';
+     el.className = `tile ${tile.type === 'property' ? 'prop' : 'special'} ${tile.type}`;
+     el.dataset.tile = String(index);
 -    el.style.gridRow = String(row); el.style.gridColumn = String(col);
 +    el.style.left = `${layout.x}%`; el.style.top = `${layout.y}%`;
 +    el.style.setProperty('--tile-w', `${layout.width}%`);
 +    el.style.setProperty('--tile-h', `${layout.height}%`);
 +    el.style.setProperty('--tile-angle', `${layout.angle}deg`);
-@@ -717,3 +783,5 @@
+     el.setAttribute('aria-label', `${tile.name}${tile.region ? ', ' + tile.region : ''}. Ketuk untuk melihat detail.`);
+     el.innerHTML = `<span class="band" style="background:${tile.color || tileAccent(tile.type)}"></span>
+       <span class="thumb">${tileThumbHTML(tile)}</span>
+@@ -714,9 +780,11 @@
+   const board = $('#board'); const node = tileEl(index);
+   if (!node) return { x: 0, y: 0 };
+   const w = $('.pawn')?.offsetWidth || 30;
 -  const cx = node.offsetLeft + node.offsetWidth / 2;
 -  const cy = node.offsetTop + node.offsetHeight * 0.86;
 -  const spread = Math.min(node.offsetWidth * 0.34, w * 0.62);
@@ -179,7 +259,13 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +  const cx = tileRect.left - boardRect.left + tileRect.width / 2;
 +  const cy = tileRect.top - boardRect.top + tileRect.height / 2;
 +  const spread = Math.min(node.offsetWidth * 0.22, w * 0.62);
-@@ -835,0 +904,12 @@
+   const angle = (slot / Math.max(1, count)) * Math.PI * 2 - Math.PI / 2;
+   const ox = count > 1 ? Math.cos(angle) * spread : 0;
+   const oy = count > 1 ? Math.sin(angle) * spread * 0.45 : 0;
+@@ -833,6 +901,18 @@
+   const list = $('#playersList');
+   if (list.dataset.sig !== html) { list.innerHTML = html; list.dataset.sig = html; }
+ }
 +function renderLeaderboard() {
 +  const list = $('#leaderboardList');
 +  if (!list) return;
@@ -192,37 +278,71 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +  if (list.dataset.sig !== html) { list.innerHTML = html; list.dataset.sig = html; }
 +}
 +
-@@ -902 +982,2 @@
+ function floatChip(playerId, delta) {
+   if (Motion.reduced()) return;
+   const row = document.querySelector(`[data-bal="${playerId}"]`);
+@@ -899,7 +979,8 @@
+   const panel = $('#actionPanel');
+   const player = getCurrentPlayer();
+   let html = '';
 -  if (state.ended) html = '<p class="note-line">Permainan selesai.</p>';
 +  if (onlineMode && !state.ended && state.current !== onlineSlot) html = `<p class="note-line">Menunggu giliran ${escapeHTML(player?.name || 'pemain')}…</p>`;
 +  else if (state.ended) html = '<p class="note-line">Permainan selesai.</p>';
-@@ -917 +998 @@
+   else if (state.busy) html = '<p class="note-line">Nasib sedang berputar…</p>';
+   else if (state.cardOpen) html = '<p class="note-line">Baca kartunya dulu.</p>';
+   else if (!player.alive) html = '<button class="btn btn-primary" data-action="continue" type="button">Lanjutkan permainan</button>';
+@@ -914,7 +995,7 @@
+       <button class="btn btn-quiet" data-action="skip-buy" type="button">Lewati</button>`;
+   } else {
+     const build = canBuildAtCurrent();
 -    html = `${build ? `<button class="btn btn-quiet" data-action="build" type="button" ${player.money < HOUSE_COST ? 'disabled' : ''}>Bangun rumah · ${money(HOUSE_COST)}</button>` : ''}
 +    html = `${build ? `<button class="btn btn-quiet" data-action="build" data-index="${player.pos}" type="button" ${player.money < HOUSE_COST ? 'disabled' : ''}>Bangun rumah · ${money(HOUSE_COST)}</button>` : ''}
-@@ -954,3 +1035,3 @@
+       <button class="btn btn-primary" data-action="continue" type="button">${state.extraTurn ? 'Giliran bonus: lanjutkan' : 'Akhiri giliran'}</button>
+       ${state.extraTurn ? '<p class="note-line">Angka kembar! Satu giliran tambahan.</p>' : ''}`;
+   }
+@@ -951,9 +1032,9 @@
+   else if (tile.type === 'mishap') rows = `<dt>Isi tumpukan</dt><dd>${MISHAP_CARDS.length} kartu</dd>`;
+   const player = cur;
+   let acts = '';
 -  if (!state.busy && !state.cardOpen && !state.ended && player?.alive && player.pos === index) {
 -    if (state.pendingBuy === index) acts = `<button class="btn btn-primary" data-action="buy" type="button" ${player.money >= tile.price ? '' : 'disabled'}>Beli · ${money(tile.price)}</button><button class="btn btn-quiet" data-action="skip-buy" type="button">Lewati</button>`;
 -    else if (state.awaiting && canBuildAtCurrent()) acts = `<button class="btn btn-quiet" data-action="build" type="button" ${player.money < HOUSE_COST ? 'disabled' : ''}>Bangun rumah · ${money(HOUSE_COST)}</button>`;
 +  if (!state.busy && !state.cardOpen && !state.ended && (!onlineMode || state.current === onlineSlot) && player?.alive) {
 +    if (player.pos === index && state.pendingBuy === index) acts = `<button class="btn btn-primary" data-action="buy" type="button" ${player.money >= tile.price ? '' : 'disabled'}>Beli · ${money(tile.price)}</button><button class="btn btn-quiet" data-action="skip-buy" type="button">Lewati</button>`;
 +    else if (state.awaiting && tile.type === 'property' && canBuildOn(index, player)) acts = `<button class="btn btn-primary house-build-action" data-action="build" data-index="${index}" type="button" ${player.money < HOUSE_COST ? 'disabled' : ''}>Bangun rumah di ${escapeHTML(tile.name)} · ${money(HOUSE_COST)}</button><p class="hint house-build-hint">Sewa saat lawan mendarat: ${money(rentFor(index))} → ${money(Math.round(tile.rent * (1 + (state.assets[index].houses + 1) * 1.2)))} setelah dibangun.</p>`;
-@@ -968 +1049 @@
+   }
+   const hint = tile.type === 'property' && !owner && !seized && !acts ? '<p class="hint">Tanah ini bisa dibeli oleh pemain yang mendarat di sini dan punya saldo cukup.</p>' : '';
+   const html = `<div class="art">${tileThumbHTML(tile)}</div><div class="band" style="background:${seized ? '#c6a15b' : owner ? owner.color : (tile.color || tileAccent(tile.type))}"></div>
+@@ -965,7 +1046,7 @@
+ function renderAll() {
+   if (!state.started) return;
+   ensurePawns();
 -  renderBoard(); renderPlayers(); renderLog(); renderControl(); renderInspector();
 +  renderBoard(); renderPlayers(); renderLeaderboard(); renderLog(); renderControl(); renderInspector();
-@@ -1067 +1148,3 @@
--Hooks.showCard = ({ card, type, cardType, impa house-build-hint">Sewa saat lawan mendarat: ${money(rentFor(index))} → ${money(Math.round(tile.rent * (1 + (state.assets[index].houses + 1) * 1.2)))} setelah dibangun.</p>`;
-@@ -968 +1049 @@
--  renderBoard(); renderPlayers(); renderLog(); renderControl(); renderInspector();
-+  renderBoard(); renderPlayers(); renderLeaderboard(); renderLog(); renderControl(); renderInspector();
-@@ -1067 +1148,3 @@
+   const changedCurrent = ui.lastCurrent !== state.current;
+   if (changedCurrent) { ui.lastCurrent = state.current; if (ui.inspected !== null) ui.inspected = null; renderInspector(); }
+   syncMoney();
+@@ -1064,12 +1145,14 @@
+ Hooks.flashTile = (index) => { const tn = tileEl(index); if (tn) { tn.classList.remove('flash'); void tn.offsetWidth; tn.classList.add('flash'); } };
+ 
+ /* ---- Event card modal (3D flip reveal) ---- */
 -Hooks.showCard = ({ card, type, cardType, impact, impactClass }) => {
 +Hooks.showCard = (data, fromRemote = false) => {
 +  if (!fromRemote) liveCard = { id: `${state.runId}-${state.turnCount}-${state.current}-${Date.now()}`, data };
 +  const { card, type, cardType, impact, impactClass } = data;
-@@ -1072 +1155 @@
+   const ec = $('#eventCard');
+   ec.getAnimations().forEach((a) => a.cancel());
+   ec.className = `event-card ${type}`;
+   $('#eventBack').innerHTML = cardBackHTML(type);
 -  $('#cardArt').innerHTML = cardArtSVG(type);
 +  $('#cardArt').innerHTML = cardArtSVG(type, card);
-@@ -1082 +1165,6 @@
+   $('#cardType').textContent = `KARTU ${cardType}`;
+   $('#cardTitle').textContent = card.title;
+   $('#cardText').textContent = card.text;
+@@ -1079,7 +1162,12 @@
+   $('#cardContinue').disabled = true;
+   Motion.play(ec, [{ transform: 'translateY(60px) rotateX(18deg) scale(.82)', opacity: 0 }, { transform: 'translateY(0) rotateX(0) scale(1)', opacity: 1 }], { duration: 520, easing: EASE.out }).done
+     .then((a) => { if (a) a.cancel(); return Motion.play(ec, [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(90deg) scale(1.06)', offset: .5 }, { transform: 'rotateY(180deg)' }], { duration: 760, delay: 280, easing: EASE.inOut }).done; })
 -    .then(() => { $('#cardContinue').disabled = false; const p = getCurrentPlayer(); if (p?.isAI) { const runId = state.runId; const playerId = p.id; setTimeout(() => { if (runId !== state.runId || getCurrentPlayer()?.id !== playerId || !state.cardOpen) return; const button = $('#cardContinue'); if (button && !button.disabled) button.click(); }, Motion.reduced() ? 120 : 620); } else $('#cardContinue').focus(); });
 +    .then(() => {
 +      const button = $('#cardContinue'); const p = getCurrentPlayer();
@@ -230,9 +350,20 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +      button.disabled = false;
 +      if (p?.isAI) { const runId = state.runId; const playerId = p.id; setTimeout(() => { if (runId !== state.runId || getCurrentPlayer()?.id !== playerId || !state.cardOpen) return; const currentButton = $('#cardContinue'); if (currentButton && !currentButton.disabled) currentButton.click(); }, Motion.reduced() ? 120 : 620); } else button.focus();
 +    });
-@@ -1149,0 +1238 @@
+ };
+ function cardBackHTML(type) {
+   const fate = type === 'fate';
+@@ -1147,23 +1235,24 @@
+ const rowsHTML = (rows) => `<table>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>`;
+ const cardKindLabel = (c) => c.kind === 'gain' ? `+ ${money(c.amount)}` : c.kind === 'lose' ? `− ${money(c.amount)}` : c.kind === 'move' ? `Maju ${c.amount} langkah` : c.kind === 'jail' ? 'Masuk lapas' : 'Lahan termahal disita';
+ const chapterHead = (no, title) => `<span class="no">BAB ${no}</span><h2>${escapeHTML(title)}</h2>`;
 +const guideScene = (scene, caption) => `<figure class="guide-scene">${sceneArtSVG(scene, scene === 'income' || scene === 'house' ? 'fate' : 'mishap')}<figcaption>${escapeHTML(caption)}</figcaption></figure>`;
-@@ -1156,7 +1245,7 @@
+ 
+ function guidePageHTML(key) {
+   const props = BOARD.filter((t) => t.type === 'property');
+   switch (key) {
+     case 'cover': return `<div class="cover-face face-in"><div><small>PANDUAN RESMI PROTOTIPE</small></div><div class="ct">Nasib<br><b>+62</b></div><div><div class="stripe"></div><small style="display:block;margin-top:12px">BUKU PANDUAN · ${props.length} KOTA · ${BOARD.length} KOTAK</small></div></div>`;
+     case 'toc': return `<div class="page">${`<span class="no">ISI BUKU</span><h2>Daftar isi</h2>`}<p>Ketuk judul bab untuk langsung ke halamannya.</p><ul class="toc">${GUIDE_CHAPTERS.map((c) => `<li><button type="button" data-goto="${c.id}"><b>${c.no}</b><span>${escapeHTML(c.title)}</span></button></li>`).join('')}</ul></div>`;
 -    case 'tujuan': return `<div class="page">${chapterHead(1, 'Tujuan permainan')}<p>Kamu dan 1–3 teman berkeliling papan, membeli tanah, memungut sewa, dan menghadapi kartu yang tidak selalu ramah. Pemain yang uangnya habis dan tidak mampu membayar tagihan <strong>bangkrut</strong> dan keluar dari permainan.</p><div class="callout"><strong>Menang</strong> berarti menjadi pemain terakhir yang belum bangkrut.</div><p>Tidak ada batas ronde. Permainan berhenti tepat ketika tinggal satu pemain yang bertahan.</p><h3>Satu perangkat, bergantian</h3><p>Versi web ini dimainkan bergantian di satu layar. Setiap pemain memakai warna dan pion sendiri.</p></div>`;
 -    case 'papan': return `<div class="page">${chapterHead(2, 'Mengenal papan')}<p>Papan berbentuk bingkai berisi <strong>${BOARD.length} kotak</strong> yang dijalani searah jarum jam, dimulai dari START di pojok kiri atas.</p><img class="fig" src="${IMG.board}" alt="Foto papan boardgame fisik dari atas, berisi kartu, dadu, dan pion" loading="lazy"><h3>${props.length} kota dalam 5 wilayah</h3>${rowsHTML(REGION_ORDER.map((r) => [escapeHTML(r), props.filter((t) => t.region === r).map((t) => escapeHTML(t.name)).join(', ')]))}<h3>Kotak khusus</h3>${rowsHTML([['START', 'Gaji lewat'], ['Kartu Takdir ×3', 'Ambil kartu'], ['Kartu Musibah ×3', 'Ambil kartu'], ['Pungli, Pajak, Pengadilan, Tol, Tilang', 'Bayar biaya'], ['Lapas', 'Masuk lapas']])}</div>`;
 -    case 'setup': return `<div class="page">${chapterHead(3, 'Persiapan pemain')}<ul><li>Pilih <strong>2, 3, atau 4 pemain</strong> dan isi nama panggilan (maksimal 18 huruf).</li><li>Setiap pemain mulai di START dengan <strong>${money(STARTING_MONEY)}</strong>.</li><li>Pemain pertama adalah pemain nomor 1. Giliran berjalan berurutan.</li></ul><img class="fig" src="${IMG.pawn}" alt="Foto tangan memegang pion akrilik di atas papan" loading="lazy" style="max-height:200px"><h3>Warna pion</h3>${rowsHTML(PLAYER_COLORS.map((p, i) => [`Pemain ${i + 1}`, p.name]))}</div>`;
@@ -246,17 +377,29 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +    case 'giliran': return `<div class="page">${chapterHead(4, 'Giliran dan dadu')}${guideScene('traffic', 'Lempar dadu dan hadapi jalanan kehidupan')}<ol style="padding-left:20px"><li>Lempar <strong>dua dadu</strong>.</li><li>Pionmu maju sejumlah total dadu, kotak demi kotak.</li><li>Kotak tempatmu berhenti diselesaikan: beli, bayar, ambil kartu, atau kena biaya.</li><li>Jika kamu mau dan syaratnya terpenuhi, bangun rumah.</li><li>Tekan <em>Akhiri giliran</em>.</li></ol><h3>Gajian</h3><p>Setiap kali pionmu sampai di START, kamu menerima <strong>${money(START_SALARY)}</strong>. Ini berlaku juga jika kamu berhenti tepat di START.</p><h3>Angka kembar</h3><p>Jika kedua dadu sama, kamu mendapat <strong>satu giliran tambahan</strong>. Tiga kali kembar berturut-turut mengirimmu langsung ke lapas.</p></div>`;
 +    case 'beli': return `<div class="page">${chapterHead(5, 'Membeli properti')}${guideScene('income', 'Tanah adalah aset, tetapi perlu strategi')}<p>Jika kamu berhenti di tanah yang masih kosong dan saldomu cukup, kamu boleh <strong>membelinya</strong> seharga yang tertera atau <strong>melewatinya</strong>.</p><img class="fig" src="${IMG.cards}" alt="Foto tangan memegang kartu properti berwarna-warni" loading="lazy" style="max-height:200px;object-position:center 30%"><ul><li>Jika saldo kurang, tanah tidak bisa dibeli.</li><li>Tanah yang dilewati tetap kosong untuk pemain berikutnya.</li><li>Tanah milikmu ditandai titik warna pionmu di papan.</li></ul>${rowsHTML([['Termurah', `${escapeHTML('Sorong')} · ${money(1_500_000)}`], ['Termahal', `Jakarta · ${money(5_000_000)}`]])}</div>`;
 +    case 'sewa': return `<div class="page">${chapterHead(6, 'Sewa dan rumah')}${guideScene('house', 'Rumah meningkatkan sewa untuk lawan yang mendarat')}<p>Jika kamu berhenti di tanah milik lawan, kamu membayar <strong>sewa</strong> kepadanya. Jika pemiliknya sedang di lapas atau sudah bangkrut, sewa tetap dibayar tetapi tidak diterima siapa pun.</p><h3>Membangun rumah</h3><ul><li>Kamu harus memiliki <strong>semua kota di satu wilayah</strong>.</li><li>Pada giliranmu setelah melempar dadu, pilih kota milikmu di wilayah lengkap dari panel detail—pion tidak harus berdiri di kota itu.</li><li>Biaya satu rumah <strong>${money(HOUSE_COST)}</strong>, maksimal ${MAX_HOUSES} rumah per kota.</li></ul><h3>Rumus sewa</h3><p>Sewa dasar × (1 + 1,2 × jumlah rumah), dibulatkan.</p>${rowsHTML([['Sewa dasar', 'Jakarta'], ['0 rumah', money(1_100_000)], ['1 rumah', money(Math.round(1_100_000 * 2.2))], ['2 rumah', money(Math.round(1_100_000 * 3.4))], ['3 rumah', money(Math.round(1_100_000 * 4.6))]])}</div>`;
-+    case 'kartu': return `<div class="page">${chapterHead(7, 'Kartu Takdir dan Musibah')}<div class="guide-illustration-grid">${guideScene('eviction', 'Penggusuran dalam simulasi proyek tol')}${guideScene('flood', 'Banjir dan biaya tak terduga')}</div><p>Kejadian pada kartu adalah skenario satir yang terinspirasi tantangan sehari-hari—bukan klaim tentang kasus berita tertentu. Berhenti di kotak kartu berarti mengambil satu kartu secara acak dari tumpukannya dan menjalankan isinya.</p><h3>Takdir · ${FATE_CARDS.length} kartu</h3><p>Sebagian besar membawa uang. Ada juga tagihan, langkah bonus, dan satu jalan menuju lapas.</p><h3>Musibah · ${MISHAP_CARDS.length} kartu</h3><p>Hampir semuanya biaya. Dua kartu mengirimmu ke lapas, dan satu menyita tanahmu.</p><div class="callout"><strong>Tanah disita negara.</strong> Properti termahalmu kembali ke bank dan berubah menjadi jalur tol. Siapa pun yang berhenti di sana, termasuk kamu, membayar ${money(SEIZED_TOLL)}. Jika kamu tidak punya tanah, kamu membayar ${money(SEIZE_FALLBACK_FEE)}.</ds, dan satu jalan menuju lapas.</p><h3>Musibah · ${MISHAP_CARDS.length} kartu</h3><p>Hampir semuanya biaya. Dua kartu mengirimmu ke lapas, dan satu menyita tanahmu.</p><div class="callout"><strong>Tanah disita negara.</strong> Properti termahalmu kembali ke bank dan berubah menjadi jalur tol. Siapa pun yang berhenti di sana, termasuk kamu, membayar ${money(SEIZED_TOLL)}. Jika kamu tidak punya tanah, kamu membayar ${money(SEIZE_FALLBACK_FEE)}.</div><img class="fig" src="${IMG.card}" alt="Foto kartu Musibah bergambar wajah matahari oranye" loading="lazy" style="max-height:150px;object-fit:contain;background:#e0572a"></div>`;
-@@ -1164,3 +1253,3 @@
++    case 'kartu': return `<div class="page">${chapterHead(7, 'Kartu Takdir dan Musibah')}<div class="guide-illustration-grid">${guideScene('eviction', 'Penggusuran dalam simulasi proyek tol')}${guideScene('flood', 'Banjir dan biaya tak terduga')}</div><p>Kejadian pada kartu adalah skenario satir yang terinspirasi tantangan sehari-hari—bukan klaim tentang kasus berita tertentu. Berhenti di kotak kartu berarti mengambil satu kartu secara acak dari tumpukannya dan menjalankan isinya.</p><h3>Takdir · ${FATE_CARDS.length} kartu</h3><p>Sebagian besar membawa uang. Ada juga tagihan, langkah bonus, dan satu jalan menuju lapas.</p><h3>Musibah · ${MISHAP_CARDS.length} kartu</h3><p>Hampir semuanya biaya. Dua kartu mengirimmu ke lapas, dan satu menyita tanahmu.</p><div class="callout"><strong>Tanah disita negara.</strong> Properti termahalmu kembali ke bank dan berubah menjadi jalur tol. Siapa pun yang berhenti di sana, termasuk kamu, membayar ${money(SEIZED_TOLL)}. Jika kamu tidak punya tanah, kamu membayar ${money(SEIZE_FALLBACK_FEE)}.</div><img class="fig" src="${IMG.card}" alt="Foto kartu Musibah bergambar wajah matahari oranye" loading="lazy" style="max-height:150px;object-fit:contain;background:#e0572a"></div>`;
+     case 'kartu2': return `<div class="page"><span class="no">BAB 7 · LANJUTAN</span><h2>Isi tumpukan</h2><h3>Takdir</h3>${rowsHTML(FATE_CARDS.map((c) => [escapeHTML(c.title), cardKindLabel(c)]))}<h3>Musibah</h3>${rowsHTML(MISHAP_CARDS.map((c) => [escapeHTML(c.title), cardKindLabel(c)]))}</div>`;
 -    case 'biaya': return `<div class="page">${chapterHead(8, 'Pajak, tol, dan denda')}<p>Kotak berikut meminta bayaran ke bank. Jika saldomu tidak cukup, kamu bangkrut.</p>${rowsHTML([['Pajak tahunan', money(BOARD.find((t) => t.type === 'tax').amount)], ['Pengadilan', money(BOARD.find((t) => t.type === 'court').amount)], ['Jalan tol', money(BOARD.find((t) => t.type === 'toll').amount)], ['Tilang', money(BOARD.find((t) => t.type === 'tilang').amount)], ['Pungli', money(PUNGLI_FEE)], ['Lahan sitaan (jalur tol)', money(SEIZED_TOLL)]])}<div class="callout">Semua biaya ini dibayar ke bank, bukan ke pemain lain. Hanya sewa yang berpindah ke pemilik tanah.</div></div>`;
 -    case 'lapas': return `<div class="page">${chapterHead(9, 'Lapas')}<p>Kamu masuk lapas jika berhenti di kotak Lapas, mengambil kartu yang mengirimmu ke sana, atau melempar kembar tiga kali berturut-turut.</p><h3>Cara keluar</h3><ul><li><strong>Angka kembar</strong>: kamu bebas dan langsung berjalan sejauh total dadu.</li><li><strong>Bayar jaminan ${money(JAIL_BAIL)}</strong> sebelum melempar. Setelah membayar, giliranmu berakhir.</li><li><strong>Tiga percobaan gagal</strong>: jaminan ${money(JAIL_BAIL)} dibayar otomatis. Jika saldo kurang, kamu bangkrut.</li></ul><p>Setiap lemparan tanpa kembar menghabiskan satu percobaan dan giliranmu lewat.</p></div>`;
 -    case 'akhir': return `<div class="page">${chapterHead(10, 'Bangkrut dan menang')}<p>Kamu bangkrut jika harus membayar lebih dari saldomu. Saldo menjadi nol, semua tanah dan rumahmu <strong>kembali ke bank</strong>, dan kamu keluar dari permainan.</p><p>Permainan berakhir ketika tinggal satu pemain yang belum bangkrut. Dia adalah pemenangnya.</p><div class="callout">Ini prototipe digital dengan angka yang disederhanakan agar gampang dimainkan di browser. Aturan di buku ini sama persis dengan aturan yang dijalankan permainan.</div><h3>Tips singkat</h3><ul><li>Simpan saldo untuk sewa dan biaya dadakan sebelum membeli tanah ketiga.</li><li>Kuasai satu wilayah penuh lebih dulu, lalu bangun rumah.</li></ul></div>`;
 +    case 'biaya': return `<div class="page">${chapterHead(8, 'Pajak, tol, dan denda')}${guideScene('bill', 'Tagihan bisa datang sebelum gajian')}<p>Kotak berikut meminta bayaran ke bank. Jika saldomu tidak cukup, kamu bangkrut.</p>${rowsHTML([['Pajak tahunan', money(BOARD.find((t) => t.type === 'tax').amount)], ['Pengadilan', money(BOARD.find((t) => t.type === 'court').amount)], ['Jalan tol', money(BOARD.find((t) => t.type === 'toll').amount)], ['Tilang', money(BOARD.find((t) => t.type === 'tilang').amount)], ['Pungli', money(PUNGLI_FEE)], ['Lahan sitaan (jalur tol)', money(SEIZED_TOLL)]])}<div class="callout">Semua biaya ini dibayar ke bank, bukan ke pemain lain. Hanya sewa yang berpindah ke pemilik tanah.</div></div>`;
 +    case 'lapas': return `<div class="page">${chapterHead(9, 'Lapas')}${guideScene('work', 'Antrean dan urusan administrasi')}<p>Kamu masuk lapas jika berhenti di kotak Lapas, mengambil kartu yang mengirimmu ke sana, atau melempar kembar tiga kali berturut-turut.</p><h3>Cara keluar</h3><ul><li><strong>Angka kembar</strong>: kamu bebas dan langsung berjalan sejauh total dadu.</li><li><strong>Bayar jaminan ${money(JAIL_BAIL)}</strong> sebelum melempar. Setelah membayar, giliranmu berakhir.</li><li><strong>Tiga percobaan gagal</strong>: jaminan ${money(JAIL_BAIL)} dibayar otomatis. Jika saldo kurang, kamu bangkrut.</li></ul><p>Setiap lemparan tanpa kembar menghabiskan satu percobaan dan giliranmu lewat.</p></div>`;
 +    case 'akhir': return `<div class="page">${chapterHead(10, 'Bangkrut dan menang')}${guideScene('income', 'Atur saldo, aset, dan dana darurat')}<p>Kamu bangkrut jika harus membayar lebih dari saldomu. Saldo menjadi nol, semua tanah dan rumahmu <strong>kembali ke bank</strong>, dan kamu keluar dari permainan.</p><p>Permainan berakhir ketika tinggal satu pemain yang belum bangkrut. Dia adalah pemenangnya.</p><div class="callout">Ini prototipe digital dengan angka yang disederhanakan agar gampang dimainkan di browser. Aturan di buku ini sama persis dengan aturan yang dijalankan permainan.</div><h3>Tips singkat</h3><ul><li>Simpan saldo untuk sewa dan biaya dadakan sebelum membeli tanah ketiga.</li><li>Kuasai satu wilayah penuh lebih dulu, lalu bangun rumah.</li></ul></div>`;
-@@ -1505,0 +1595 @@
+     case 'catatan': return `<div class="page"><span class="no">CATATAN</span><h2>Sampai ketemu di papan</h2><p>Buku ini bisa dibuka lagi kapan saja dari tombol <em>Panduan</em> di ruang permainan.</p><h3>Kredit gambar</h3><p>Ilustrasi dan potongan adegan: aset asli proyek. Foto papan, kartu, dan pion: boardgame fisik <em>WNI Simulator</em>, materi unggahan pemilik proyek. Foto Jakarta: Gunawan Kartapranata, CC BY-SA 3.0, Wikimedia Commons.</p></div>`;
+     case 'endpaper': return '<div class="endpaper face-in"><div style="font-family:var(--font-display);font-size:34px;color:#8a7a50;text-transform:uppercase;letter-spacing:.06em">Nasib +62</div></div>';
+     case 'back': return `<div class="cover-face face-in"><div></div><div class="ct" style="font-size:clamp(32px,5vw,64px)">Selamat<br>bermain.</div><div class="stripe"></div></div>`;
+@@ -1503,6 +1592,7 @@
+ function startGameFromSetup() {
+  const human=(($('#playerName0')&&$('#playerName0').value.trim())||DEFAULT_NAMES[0]).slice(0,18);
+  const names=[human].concat(AI_NAMES[setupState.difficulty].slice(0,setupState.count-1));
 + onlineMode = false; onlineSlot = 0;
-@@ -1523,3 +1613,6 @@
+  closeModal('setupModal');curtainThrough('Buka palang',()=>beginGame(names));
+ }
+ function beginGame(names) {
+@@ -1520,12 +1610,18 @@
+   requestAnimationFrame(() => { state.players.forEach((p) => placePawn(p, p.pos)); renderAll(); layoutPawns(); Hooks.announce(`Permainan dimulai. Giliran ${state.players[0].name}.`); });
+ }
+ function setCorePhoto() {
 -  const el = $('#corePhoto'); el.style.backgroundImage = `url('${IMG.monas}')`;
 -  const p = CITY_PHOTOS.Jakarta; if (!p) return;
 -  const img = new Image(); img.referrerPolicy = 'no-referrer'; img.onload = () => { el.style.backgroundImage = `url('${p.src}')`; }; img.src = p.src;
@@ -266,77 +409,26 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
 +  probe.referrerPolicy = 'no-referrer';
 +  probe.onerror = () => { el.style.backgroundImage = `url('${IMG.monas}')`; };
 +  probe.src = CITY_PHOTOS.Jakarta?.src || IMG.monas;
-@@ -1528 +1621,4 @@
+ }
+ function leaveGame() {
 -  state.runId += 1; state.started = false; state.busy = false;
 +  const wasOnline = onlineMode;
 +  onlineMode = false; onlineSlot = 0; liveCard = null;
 +  if (wasOnline) { const bridge = window.NasibOnlineBridge; if (bridge?.disconnect) void bridge.disconnect(); }
 +  state.runId += 1; state.started = false; state.busy = false; state.awaiting = false;
-@@ -1535,0 +1632 @@
+   ['cardModal', 'gameOverModal'].forEach(closeModal);
+   curtainThrough('Kembali', () => showScreen(false));
+ }
+@@ -1533,6 +1629,7 @@
+ function initEvents() {
+   // landing
+   ['heroPlay', 'navPlay', 'howPlay'].forEach((id) => $(`#${id}`).addEventListener('click', () => openSetup()));
 +  ['heroOnline', 'navOnline'].forEach((id) => { const el = $(`#${id}`); if (el) el.addEventListener('click', () => window.dispatchEvent(new CustomEvent('nasib:online-open'))); });
-@@ -1545 +1642,4 @@
--  $('#cardContinue').addEventListener('click', () => { closeModal('cardModal'); state.cardOpen = false; renderAll(); if (getCurrentPlayer()?.isAI) scheduleComputerTurn(360); });
-+  $('#cardContinue').addEventListener('click', () => {
-+    if (onlineMode && window.NasibOnlineBridge?.requestAction) { window.NasibOnlineBridge.requestAction('card-continue'); return; }
-+    closeModal('cardModal'); state.cardOpen = false; liveCard = null; renderAll(); if (getCurrentPlayer()?.isAI) scheduleComputerTurn(360);
-+  });
-@@ -1563 +1663,8 @@
--    if (action) { if (!action.disabled) handleAction(action.dataset.action); return; }
-+    if (action) {
-+      if (!action.disabled) {
-+        const targetIndex = action.dataset.index === undefined ? undefined : Number(action.dataset.index);
-+        if (onlineMode && window.NasibOnlineBridge?.requestAction) window.NasibOnlineBridge.requestAction(action.dataset.action, targetIndex);
-+        else handleAction(action.dataset.action, targetIndex);
-+      }
-+      return;
-+    }
-@@ -1609,2 +1716,47 @@
--
--}
-+window.NasibEngine = {
-+  isOnline: () => onlineMode,
-+  getLocalSlot: () => onlineSlot,
-+  getSnapshot() {
-+    return {
-+      players: state.players.map((p) => ({ id:p.id, name:p.name, token:p.token, color:p.color, money:p.money, pos:p.pos, jailed:p.jailed, jailTurns:p.jailTurns, alive:p.alive, isAI:p.isAI, aiDifficulty:p.aiDifficulty })),
-+      current:state.current, turnCount:state.turnCount, round:state.round,
-+      assets:state.assets.map((a) => a ? { ownerId:a.ownerId, houses:a.houses } : null),
-+      awaiting:state.awaiting, busy:Boolean(state.busy), ended:state.ended, extraTurn:state.extraTurn,
-+      doubleStreak:state.doubleStreak, pendingBuy:state.pendingBuy, cardOpen:state.cardOpen,
-+      dice:[...state.dice], log:state.log.map((x) => ({...x})), lastRollText:state.lastRollText,
-+      started:state.started, stateSeized:[...state.stateSeized], liveCard:liveCard ? JSON.parse(JSON.stringify(liveCard)) : null,
-+    };
-+  },
-+  async startOnlineGame(names, slot = 0) {
-+    onlineMode = true; onlineSlot = Math.max(0, Math.min(3, Number(slot) || 0));
-+    const cleanNames = names.map((p) => typeof p === 'string' ? p : p.name).slice(0,4);
-+    if (cleanNames.length < 2) throw new Error('Mabar membutuhkan minimal 2 pemain.');
-+    beginGame(cleanNames);
-+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-+    return this.getSnapshot();
-+  },
-+  applySnapshot(snapshot) {
-+    if (!snapshot || !Array.isArray(snapshot.players)) return false;
-+    const localRunId = state.runId; const previousCardId = liveCard?.id || null;
-+    Object.assign(state, snapshot, { runId:localRunId, busy:Boolean(snapshot.busy), stateSeized:new Set(snapshot.stateSeized || []) });
-+    state.assets = (snapshot.assets || []).map((a) => a ? { ownerId:a.ownerId, houses:Number(a.houses) || 0 } : null);
-+    liveCard = snapshot.liveCard ? JSON.parse(JSON.stringify(snapshot.liveCard)) : null;
-+    if (state.cardOpen && liveCard && liveCard.id !== previousCardId) Hooks.showCard(liveCard.data, true);
-+    if (!state.cardOpen) closeModal('cardModal');
-+    Hooks.render();
-+    return true;
-+  },
-+  async performAction(action, payload) {
-+    if (action === 'roll') return await rollDice();
-+    if (action === 'buy') return buyProperty();
-+    if (action === 'skip-buy') { if (!state.busy && state.pendingBuy !== null) { state.pendingBuy = null; Hooks.render(); } return; }
-+    if (action === 'build') return buildHouse(Number.isInteger(payload) ? payload : undefined);
-+    if (action === 'continue') return continueTurn();
-+    if (action === 'bail') return payBail();
-+    if (action === 'card-continue') { if (state.cardOpen && !state.busy) { closeModal('cardModal'); state.cardOpen = false; liveCard = null; Hooks.render(); } return; }
-+  },
-+  canAct(slot) { return Boolean(state.started && !state.ended && !state.busy && state.current === Number(slot) && state.players[state.current]?.alive); },
-+  leaveOnlineGame() { if (onlineMode && state.started) leaveGame(); else { onlineMode = false; onlineSlot = 0; liveCard = null; void window.NasibOnlineBridge?.disconnect?.(); } },
-+};
-+
-+}
+   ['heroGuide', 'navGuide', 'openRules'].forEach((id) => $(`#${id}`).addEventListener('click', () => Guide.open()));
+   $('#toTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: Motion.reduced() ? 'auto' : 'smooth' }));
+   // setup modal
+@@ -1542,7 +1639,10 @@
+   $('#nameFields').addEventListener('keydown', (e) => { if (e.key === 'Enter') startGameFromSetup(); });
+   // game room
+   $('#backHome').addEventListener('click', () => { if (state.started && !state.ended && !window.confirm('Keluar dari permainan? Progres ronde ini akan hilang.')) return; leaveGame(); });
+-  $('#cardContinue').addEventListener('c

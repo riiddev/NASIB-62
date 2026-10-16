@@ -11,7 +11,11 @@ if (typeof transformed !== 'string') throw new Error('Could not apply src/online
 for (const [label, valid] of [
   ['starting capital is Rp10,000,000', transformed.includes('const STARTING_MONEY = 10_000_000;')],
   ['starting capital is Rp10,000,000', transformed.includes('const STARTING_MONEY = 10_000_000;')],
+  ['starting capital is Rp10,000,000', transformed.includes('const STARTING_MONEY = 10_000_000;')],
   ['START salary is Rp1,000,000', transformed.includes('const START_SALARY = 1_000_000;')],
+  ['build houses through selected-property action', transformed.includes('function canBuildOn(index, player = getCurrentPlayer())') && transformed.includes('buildHouse(Number.isInteger(payload) ? payload : undefined)')],
+  ['illustrated story cards are enabled', transformed.includes("function sceneArtSVG(scene, type = 'mishap')")],
+  ['live leaderboard is rendered', transformed.includes('function renderLeaderboard()')],
   ['build houses through selected-property action', transformed.includes('function canBuildOn(index, player = getCurrentPlayer())') && transformed.includes('buildHouse(Number.isInteger(payload) ? payload : undefined)')],
   ['illustrated story cards are enabled', transformed.includes("function sceneArtSVG(scene, type = 'mishap')")],
   ['live leaderboard is rendered', transformed.includes('function renderLeaderboard()')],
