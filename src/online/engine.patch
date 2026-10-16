@@ -281,7 +281,15 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
  function floatChip(playerId, delta) {
    if (Motion.reduced()) return;
    const row = document.querySelector(`[data-bal="${playerId}"]`);
-@@ -899,7 +979,8 @@
+@@ -866,6 +946,7 @@
+ 
+ function renderLog() {
+   const log = $('#gameLog');
++  if (!log) return;
+   const sig = state.log.map((e) => e.time + e.message).join('|');
+   if (log.dataset.sig === sig) return;
+   log.dataset.sig = sig;
+@@ -899,7 +980,8 @@
    const panel = $('#actionPanel');
    const player = getCurrentPlayer();
    let html = '';
@@ -291,7 +299,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
    else if (state.busy) html = '<p class="note-line">Nasib sedang berputar…</p>';
    else if (state.cardOpen) html = '<p class="note-line">Baca kartunya dulu.</p>';
    else if (!player.alive) html = '<button class="btn btn-primary" data-action="continue" type="button">Lanjutkan permainan</button>';
-@@ -914,7 +995,7 @@
+@@ -914,7 +996,7 @@
        <button class="btn btn-quiet" data-action="skip-buy" type="button">Lewati</button>`;
    } else {
      const build = canBuildAtCurrent();
@@ -300,7 +308,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
        <button class="btn btn-primary" data-action="continue" type="button">${state.extraTurn ? 'Giliran bonus: lanjutkan' : 'Akhiri giliran'}</button>
        ${state.extraTurn ? '<p class="note-line">Angka kembar! Satu giliran tambahan.</p>' : ''}`;
    }
-@@ -951,9 +1032,9 @@
+@@ -951,9 +1033,9 @@
    else if (tile.type === 'mishap') rows = `<dt>Isi tumpukan</dt><dd>${MISHAP_CARDS.length} kartu</dd>`;
    const player = cur;
    let acts = '';
@@ -313,7 +321,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
    }
    const hint = tile.type === 'property' && !owner && !seized && !acts ? '<p class="hint">Tanah ini bisa dibeli oleh pemain yang mendarat di sini dan punya saldo cukup.</p>' : '';
    const html = `<div class="art">${tileThumbHTML(tile)}</div><div class="band" style="background:${seized ? '#c6a15b' : owner ? owner.color : (tile.color || tileAccent(tile.type))}"></div>
-@@ -965,7 +1046,7 @@
+@@ -965,7 +1047,7 @@
  function renderAll() {
    if (!state.started) return;
    ensurePawns();
@@ -322,7 +330,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
    const changedCurrent = ui.lastCurrent !== state.current;
    if (changedCurrent) { ui.lastCurrent = state.current; if (ui.inspected !== null) ui.inspected = null; renderInspector(); }
    syncMoney();
-@@ -1064,12 +1145,14 @@
+@@ -1064,12 +1146,14 @@
  Hooks.flashTile = (index) => { const tn = tileEl(index); if (tn) { tn.classList.remove('flash'); void tn.offsetWidth; tn.classList.add('flash'); } };
  
  /* ---- Event card modal (3D flip reveal) ---- */
@@ -339,7 +347,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
    $('#cardType').textContent = `KARTU ${cardType}`;
    $('#cardTitle').textContent = card.title;
    $('#cardText').textContent = card.text;
-@@ -1079,7 +1162,12 @@
+@@ -1079,7 +1163,12 @@
    $('#cardContinue').disabled = true;
    Motion.play(ec, [{ transform: 'translateY(60px) rotateX(18deg) scale(.82)', opacity: 0 }, { transform: 'translateY(0) rotateX(0) scale(1)', opacity: 1 }], { duration: 520, easing: EASE.out }).done
      .then((a) => { if (a) a.cancel(); return Motion.play(ec, [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(90deg) scale(1.06)', offset: .5 }, { transform: 'rotateY(180deg)' }], { duration: 760, delay: 280, easing: EASE.inOut }).done; })
@@ -353,7 +361,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
  };
  function cardBackHTML(type) {
    const fate = type === 'fate';
-@@ -1147,23 +1235,24 @@
+@@ -1147,23 +1236,24 @@
  const rowsHTML = (rows) => `<table>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>`;
  const cardKindLabel = (c) => c.kind === 'gain' ? `+ ${money(c.amount)}` : c.kind === 'lose' ? `− ${money(c.amount)}` : c.kind === 'move' ? `Maju ${c.amount} langkah` : c.kind === 'jail' ? 'Masuk lapas' : 'Lahan termahal disita';
  const chapterHead = (no, title) => `<span class="no">BAB ${no}</span><h2>${escapeHTML(title)}</h2>`;
@@ -388,7 +396,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
      case 'catatan': return `<div class="page"><span class="no">CATATAN</span><h2>Sampai ketemu di papan</h2><p>Buku ini bisa dibuka lagi kapan saja dari tombol <em>Panduan</em> di ruang permainan.</p><h3>Kredit gambar</h3><p>Ilustrasi dan potongan adegan: aset asli proyek. Foto papan, kartu, dan pion: boardgame fisik <em>WNI Simulator</em>, materi unggahan pemilik proyek. Foto Jakarta: Gunawan Kartapranata, CC BY-SA 3.0, Wikimedia Commons.</p></div>`;
      case 'endpaper': return '<div class="endpaper face-in"><div style="font-family:var(--font-display);font-size:34px;color:#8a7a50;text-transform:uppercase;letter-spacing:.06em">Nasib +62</div></div>';
      case 'back': return `<div class="cover-face face-in"><div></div><div class="ct" style="font-size:clamp(32px,5vw,64px)">Selamat<br>bermain.</div><div class="stripe"></div></div>`;
-@@ -1503,6 +1592,7 @@
+@@ -1503,6 +1593,7 @@
  function startGameFromSetup() {
   const human=(($('#playerName0')&&$('#playerName0').value.trim())||DEFAULT_NAMES[0]).slice(0,18);
   const names=[human].concat(AI_NAMES[setupState.difficulty].slice(0,setupState.count-1));
@@ -396,7 +404,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
   closeModal('setupModal');curtainThrough('Buka palang',()=>beginGame(names));
  }
  function beginGame(names) {
-@@ -1520,12 +1610,18 @@
+@@ -1520,12 +1611,18 @@
    requestAnimationFrame(() => { state.players.forEach((p) => placePawn(p, p.pos)); renderAll(); layoutPawns(); Hooks.announce(`Permainan dimulai. Giliran ${state.players[0].name}.`); });
  }
  function setCorePhoto() {
@@ -419,7 +427,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
    ['cardModal', 'gameOverModal'].forEach(closeModal);
    curtainThrough('Kembali', () => showScreen(false));
  }
-@@ -1533,6 +1629,7 @@
+@@ -1533,6 +1630,7 @@
  function initEvents() {
    // landing
    ['heroPlay', 'navPlay', 'howPlay'].forEach((id) => $(`#${id}`).addEventListener('click', () => openSetup()));
@@ -427,7 +435,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
    ['heroGuide', 'navGuide', 'openRules'].forEach((id) => $(`#${id}`).addEventListener('click', () => Guide.open()));
    $('#toTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: Motion.reduced() ? 'auto' : 'smooth' }));
    // setup modal
-@@ -1542,7 +1639,10 @@
+@@ -1542,7 +1640,10 @@
    $('#nameFields').addEventListener('keydown', (e) => { if (e.key === 'Enter') startGameFromSetup(); });
    // game room
    $('#backHome').addEventListener('click', () => { if (state.started && !state.ended && !window.confirm('Keluar dari permainan? Progres ronde ini akan hilang.')) return; leaveGame(); });
@@ -439,7 +447,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
    $('#playAgain').addEventListener('click', () => { const names = state.players.map((p) => p.name); closeModal('gameOverModal'); openSetup(names); });
    $('#homeAgain').addEventListener('click', () => { closeModal('gameOverModal'); leaveGame(); });
    // guide
-@@ -1560,7 +1660,14 @@
+@@ -1560,7 +1661,14 @@
    // one delegated listener for actions, close buttons, and tile inspection
    document.addEventListener('click', (e) => {
      const action = e.target.closest('[data-action]');
@@ -455,7 +463,7 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
      const close = e.target.closest('[data-close]');
      if (close) { const m = modalStack.find((x) => x.id === close.dataset.close); if (!m || m.closable) closeModal(close.dataset.close); return; }
      const tile = e.target.closest('.tile[data-tile]');
-@@ -1606,5 +1713,50 @@
+@@ -1606,5 +1714,50 @@
  window.addEventListener('error', (e) => { console.error('NASIB +62 error:', e.message); });
  window.addEventListener('unhandledrejection', (e) => { console.error('NASIB +62 unhandled promise:', e.reason); });
  init();

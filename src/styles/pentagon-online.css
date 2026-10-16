@@ -110,3 +110,11 @@
 @media(max-width:1100px){.room{grid-template-columns:minmax(0,1fr) minmax(280px,320px);gap:14px;padding:14px;}}
 @media(max-width:820px){.room{grid-template-columns:minmax(0,1fr);padding:10px;}.board-wrap{max-width:min(100%,calc(100svh - 170px));}.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}.leaderboard-card{grid-column:span 1;}}
 @media(max-width:560px){.side{display:flex;}.leaderboard-row{grid-template-columns:24px 26px minmax(0,1fr) auto;gap:6px;padding:7px;}.leaderboard-money{font-size:10px;}.board-wrap{padding:3px;max-width:100%;}.board-core{left:23.8%;top:26%;width:52.4%;height:47.5%;}.guide-illustration-grid{gap:5px;}}
+
+
+/* Combined players + cash ranking panel */
+.players-rank-divider{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12);}
+.players-rank-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.players-rank-head h4{margin:0;color:rgba(255,255,255,.84);font:800 16px/1.1 var(--font-display);letter-spacing:.025em;text-transform:uppercase;}
+.players-rank-head span{font-size:9px;font-weight:900;letter-spacing:.13em;color:#8ed2a8;background:rgba(71,168,118,.13);border:1px solid rgba(71,168,118,.25);border-radius:5px;padding:4px 6px;}
+.player-ranking-card .leaderboard-note{margin-top:9px;}
