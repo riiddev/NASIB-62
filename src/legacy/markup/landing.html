@@ -1,0 +1,111 @@
+<!-- ===================== LANDING ===================== -->
+<header class="site-header" id="siteHeader">
+  <a class="brand" href="#beranda" aria-label="NASIB +62 — ke awal halaman">
+    <span class="brand-mark">N<i>+</i></span>
+    <span class="brand-name">NASIB <b>+62</b></span>
+  </a>
+  <nav class="nav" aria-label="Navigasi utama">
+    <a class="hide-m" href="#fitur">Fitur</a>
+    <a class="hide-m" href="#cara-main">Cara main</a>
+    <a class="hide-m" href="#wilayah">Wilayah</a>
+    <button class="link" id="navGuide" type="button">Panduan</button>
+    <button class="btn btn-dark" id="navPlay" type="button">Main</button>
+  </nav>
+</header>
+
+<main id="landing">
+  <section class="hero" id="beranda" aria-labelledby="heroTitle">
+    <div class="hero-layer hero-bg" data-depth="0.035" style="background-image:url('/assets/nasib-art-02.webp')" role="img" aria-label="Ilustrasi Jakarta: Monas, gerbang tol, kemacetan, tumpukan berkas dan dadu merah raksasa"></div>
+    <div class="hero-layer hero-wash" aria-hidden="true"></div>
+    <div class="hero-layer hero-fg" id="heroFg" aria-hidden="true">
+      <span class="note" style="left:60%;top:16%" data-depth="0.09">Rp 100 rb</span>
+      <span class="note n2" style="left:68%;top:56%" data-depth="-0.07">Rp 50 rb</span>
+      <span class="coin" style="left:58%;top:40%" data-depth="0.12"></span>
+      <span class="coin" style="left:76%;top:30%;width:18px;height:18px" data-depth="-0.1"></span>
+      <span class="note n2" style="left:80%;top:66%;transform:rotate(18deg)" data-depth="0.06">Rp 20 rb</span>
+    </div>
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1 id="heroTitle"><span class="ln"><span>Hidup sudah susah.</span></span><span class="ln"><span class="red">Dadu jangan ikut curang.</span></span></h1>
+        <p class="hero-sub" data-hero-in>Boardgame satir tentang uang, tanah, dan kejutan hidup sehari-hari. Beli kota, tagih sewa, bayar pungli, dan bertahan sampai pemain terakhir.</p>
+        <div class="hero-actions" data-hero-in>
+          <button class="btn btn-primary" id="heroPlay" type="button">Main sekarang <svg><use href="#i-arrow"/></svg></button>
+          <button class="btn btn-ghost" id="heroGuide" type="button"><svg><use href="#i-book"/></svg> Buka buku panduan</button>
+        </div>
+        <div class="hero-facts" data-hero-in>
+          <div><b>2–4</b>pemain, satu layar</div>
+          <div><b>28</b>kotak di papan</div>
+          <div><b>25</b>kartu nasib</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-dice" id="heroDice" role="button" tabindex="0" aria-label="Dadu latihan. Tekan untuk melempar."></div>
+    <p class="hero-dice-hint">Coba lempar dadunya. Yang ini gratis, yang di meja tidak.</p>
+    <div class="scroll-cue" aria-hidden="true">Gulir<i></i></div>
+  </section>
+
+  <div class="ticker" aria-hidden="true"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <section class="section" id="fitur" aria-labelledby="fiturTitle">
+    <div class="sec-head reveal">
+      <h2 id="fiturTitle">Tujuh cara<br>uangmu hilang.</h2>
+      <p>Setiap fitur di bawah ini sudah ada di game yang bisa kamu mainkan. Pilih satu untuk melihat contohnya.</p>
+    </div>
+    <div class="showcase reveal">
+      <div class="feat-list" role="tablist" aria-label="Fitur permainan" id="featList"></div>
+      <div class="stage grain" id="featStage" role="tabpanel" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="section how" id="cara-main" aria-labelledby="caraTitle">
+    <div class="sec-head reveal">
+      <h2 id="caraTitle">Aturannya muat<br>di satu layar.</h2>
+      <p>Lihat satu giliran penuh: lempar dadu, jalan, mampir di tanah kosong, lalu beli.</p>
+    </div>
+    <div class="how-demo reveal" id="howDemo" aria-label="Contoh satu giliran">
+      <div class="demo-dice" id="demoDice"></div>
+      <div class="demo-track" id="demoTrack"></div>
+      <div class="demo-say" id="demoSay" aria-live="polite"></div>
+      <button class="demo-replay" id="demoReplay" type="button">Ulangi contoh</button>
+    </div>
+    <div class="steps reveal">
+      <div class="step"><b>A</b><h3>Lempar dua dadu</h3><p>Jalan searah jarum jam. Lewat START berarti gajian Rp2 juta.</p></div>
+      <div class="step"><b>B</b><h3>Beli atau bayar</h3><p>Tanah kosong bisa dibeli. Tanah milik lawan berarti bayar sewa.</p></div>
+      <div class="step"><b>C</b><h3>Hadapi kartu</h3><p>Kartu Takdir bisa memberi bonus. Kartu Musibah hampir tidak pernah.</p></div>
+      <div class="step"><b>D</b><h3>Bertahan hidup</h3><p>Pemain terakhir yang belum bangkrut jadi pemenang.</p></div>
+    </div>
+    <div style="margin-top:36px" class="reveal"><button class="btn btn-primary" id="howPlay" type="button">Oke, gas main <svg><use href="#i-arrow"/></svg></button></div>
+  </section>
+
+  <section class="section regions" id="wilayah" aria-labelledby="wilTitle">
+    <div class="sec-head reveal">
+      <h2 id="wilTitle">Lima wilayah,<br>lima belas kota.</h2>
+      <p>Kuasai semua kota di satu wilayah untuk membuka pembangunan rumah. Harga dan sewa di bawah ini sama persis dengan yang dipakai di papan.</p>
+    </div>
+    <div class="region-grid reveal" id="regionGrid"></div>
+  </section>
+
+  <footer class="footer grain">
+    <div class="footer-top">
+      <div class="big">Nasib <b>+62</b></div>
+      <button class="btn btn-primary" id="toTop" type="button"><svg style="transform:none"><use href="#i-up"/></svg> Kembali ke awal</button>
+    </div>
+    <div class="credits">
+      <div>
+        <h4>Aset visual</h4>
+        <p>Ilustrasi hero dan potongan adegan di papan: aset asli proyek NASIB +62.</p>
+        <p>Foto referensi papan, kartu, pion dan sampul: materi unggahan pemilik proyek, diambil dari boardgame fisik <em>WNI Simulator</em>.</p>
+      </div>
+      <div>
+        <h4>Foto kota</h4>
+        <div id="photoCredits"></div>
+      </div>
+      <div>
+        <h4>Teknologi</h4>
+        <p>HTML, CSS, JavaScript murni. Animasi memakai Web Animations API; GSAP dari cdnjs dipakai bila tersedia. Font dari Google Fonts.</p>
+      </div>
+    </div>
+    <p class="fine">NASIB +62 adalah prototipe fan-made dengan aturan ringkas. Bukan produk resmi dari penerbit boardgame yang menjadi inspirasinya.</p>
+  </footer>
+</main>
+

@@ -1,0 +1,42 @@
+<!-- ===================== GAME ROOM ===================== -->
+<main id="game" class="game hidden" aria-label="Ruang permainan">
+  <div class="topbar">
+    <button class="iconbtn" id="backHome" type="button"><svg><use href="#i-home"/></svg><span>Beranda</span></button>
+    <span class="brand-name">NASIB <b style="color:var(--red-2)">+62</b></span>
+    <div class="turn-pill" id="turnPillWrap"><i id="turnDot"></i><span id="turnPill">Menyiapkan meja…</span></div>
+    <button class="iconbtn" id="openRules" type="button" aria-label="Buka buku panduan"><svg><use href="#i-book"/></svg><span>Panduan</span></button>
+  </div>
+  <div class="room">
+    <section aria-label="Papan permainan">
+      <div class="board-wrap" id="boardWrap">
+        <div class="board" id="board">
+          <div class="board-core" id="boardCore">
+            <div class="core-photo" id="corePhoto"></div>
+            <div class="core-shade"></div>
+            <div class="core-ui" id="coreUi">
+              <div class="core-title">Nasib <b>+62</b></div>
+              <div id="controlDeck" class="deck">
+                <div class="core-turn" id="coreTurn"></div>
+                <div class="core-money" id="coreMoney"></div>
+                <div class="dice-stage" id="diceStage" aria-hidden="true"></div>
+                <div class="core-status" id="coreStatus"></div>
+                <div class="core-actions" id="actionPanel"></div>
+              </div>
+            </div>
+          </div>
+          <div class="pawn-layer" id="pawnLayer"></div>
+        </div>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:#3e8e6b"></i>Properti</span><span><i style="background:#2b63c4"></i>Takdir</span><span><i style="background:#e0572a"></i>Musibah</span><span><i style="background:#c6a15b"></i>Biaya dadakan</span><span><i style="background:#f4c430"></i>Tiap kotak bisa diketuk</span>
+      </div>
+      <div class="dock" id="dock"></div>
+    </section>
+    <aside class="side">
+      <section class="card"><div class="card-head"><h3>Para pejuang</h3><span id="roundLabel">Ronde 1</span></div><div class="players" id="playersList"></div></section>
+      <section class="card inspect" id="inspector" aria-live="polite"></section>
+      <section class="card log-card"><div class="card-head"><h3>Kabar terbaru</h3><span>Langsung</span></div><div class="log" id="gameLog"></div></section>
+    </aside>
+  </div>
+</main>
+

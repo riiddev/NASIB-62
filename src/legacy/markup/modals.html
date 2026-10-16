@@ -1,0 +1,56 @@
+<!-- ===================== MODALS ===================== -->
+<div id="setupModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+  <div class="modal-backdrop" data-close="setupModal"></div>
+  <div class="modal-panel">
+    <button class="modal-close" data-close="setupModal" aria-label="Tutup" type="button">×</button>
+    <h2 id="setupTitle">Siapa saja yang siap diuji?</h2>
+    <p class="modal-desc">Kamu bermain melawan peserta komputer. Atur jumlah lawan dan gaya strategi mereka.</p>
+    <span class="field-label" id="countLabel">JUMLAH PEMAIN</span>
+    <div class="seg" id="playerCountSeg" role="group" aria-labelledby="countLabel">
+      <button type="button" data-n="2" aria-pressed="false">Kamu + 1</button><button type="button" data-n="3" aria-pressed="false">Kamu + 2</button><button type="button" data-n="4" aria-pressed="true">Kamu + 3</button>
+    </div>
+    <span class="field-label">GAYA STRATEGI KOMPUTER</span>
+    <div class="seg ai-level-seg" id="aiDifficultySeg" role="group" aria-label="Pilih tingkat strategi komputer">
+      <button type="button" data-difficulty="staff" aria-pressed="false"><b>STAF FRAKSI</b><small>Strategi dasar</small></button>
+      <button type="button" data-difficulty="cabinet" aria-pressed="true"><b>ELIT KABINET</b><small>Kalkulasi aset</small></button>
+      <button type="button" data-difficulty="oligarch" aria-pressed="false"><b>OLIGARKI</b><small>Agresif terukur</small></button>
+    </div>
+    <p class="ai-level-summary" id="aiLevelSummary">Disiplin anggaran · strategi aset</p>
+    <div id="nameFields" class="name-fields"></div>
+    <div id="aiRosterPreview" class="ai-roster-preview" aria-live="polite"></div>
+    <button id="startGame" class="btn btn-primary btn-wide" style="margin-top:20px" type="button">Buka papan permainan <svg><use href="#i-arrow"/></svg></button>
+    <p class="fine-print">Semua peserta memulai dengan saldo setara Rp15.000.000. Komputer tidak mendapat bonus uang atau hasil dadu.</p>
+  </div>
+</div>
+
+<div id="cardModal" class="modal card-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+  <div class="modal-backdrop"></div>
+  <div class="modal-panel">
+    <div class="card-wrap">
+      <div class="event-card" id="eventCard">
+        <div class="event-face event-back" id="eventBack"></div>
+        <div class="event-face event-front" id="eventFront">
+          <div class="art" id="cardArt"></div>
+          <div class="ev-type" id="cardType"></div>
+          <h3 id="cardTitle"></h3>
+          <p id="cardText"></p>
+          <div class="ev-impact" id="cardImpact"></div>
+        </div>
+      </div>
+      <div class="card-actions"><button id="cardContinue" class="btn btn-primary" type="button">Terima nasib ini <svg><use href="#i-arrow"/></svg></button></div>
+    </div>
+  </div>
+</div>
+
+<div id="gameOverModal" class="modal gameover hidden" role="dialog" aria-modal="true" aria-labelledby="gameOverTitle">
+  <div class="modal-backdrop"></div>
+  <div class="modal-panel">
+    <div class="confetti" id="confetti"></div>
+    <small style="letter-spacing:.16em;font-weight:800;color:var(--yellow-2)">PERMAINAN SELESAI</small>
+    <h2 id="gameOverTitle">Pemenang bertahan hidup</h2>
+    <div class="winner-row"><span class="standee" id="winnerStandee"></span><div><small>WARGA PALING TANGGUH</small><strong id="winnerName">Pemain</strong><span id="winnerMoney" style="font-weight:700"></span></div></div>
+    <button id="playAgain" class="btn btn-primary btn-wide" type="button">Main lagi</button>
+    <button id="homeAgain" class="btn btn-quiet btn-wide" style="margin-top:10px" type="button">Kembali ke beranda</button>
+  </div>
+</div>
+

@@ -1,0 +1,20 @@
+<!-- ===================== GUIDEBOOK ===================== -->
+<div id="guide" class="guide hidden" role="dialog" aria-modal="true" aria-label="Buku panduan NASIB +62">
+  <div class="guide-backdrop" id="guideBackdrop"></div>
+  <div class="guide-ui on-dark">
+    <span class="title">Buku panduan</span>
+    <div style="display:flex;gap:8px">
+      <button class="iconbtn" id="guideToc" type="button">Daftar isi</button>
+      <button class="iconbtn" id="guideClose" type="button" aria-label="Tutup buku panduan (Esc)">Tutup ×</button>
+    </div>
+  </div>
+  <div class="book-stage" id="bookStage"><div class="book-shadow"></div><div class="book" id="book"></div></div>
+  <div class="guide-bar on-dark">
+    <button class="btn btn-quiet" id="guidePrev" type="button" aria-label="Halaman sebelumnya"><svg><use href="#i-left"/></svg> Sebelumnya</button>
+    <span class="counter" id="guideCounter" aria-live="polite">Sampul</span>
+    <button class="btn btn-primary" id="guideNext" type="button" aria-label="Halaman berikutnya">Berikutnya <svg><use href="#i-right"/></svg></button>
+  </div>
+</div>
+
+<div class="curtain" id="curtain" aria-hidden="true"><div class="top"></div><div class="bot"></div><div class="curtain-label"><span id="curtainLabel">Buka palang</span></div></div>
+
