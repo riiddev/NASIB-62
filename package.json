@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && node scripts/prepare-pages.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "check": "node scripts/check-engine-patch.mjs",
     "build:pages": "npm run build"
