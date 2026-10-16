@@ -1,6 +1,6 @@
 # NASIB +62 — menyiapkan mabar realtime
 
-Mode mabar menggunakan **Supabase Realtime Broadcast + Presence**. Tidak perlu membuat akun pemain atau membuat tabel game. Host menjadi sumber state gameplay; kode room mengundang 2–4 browser ke channel yang sama. Chat dan perubahan giliran dikirim melalui channel tersebut.
+Mode mabar menggunakan **Supabase Realtime Broadcast + Presence**. Tidak perlu membuat akun pemain atau membuat tabel game. Host menjadi sumber state gameplay; kode room mengundang 2–4 browser ke channel yang sama. Chat, perubahan giliran, pembelian, dan pembangunan rumah di petak yang dipilih dikirim melalui channel tersebut.
 
 ## 1. Buat project Supabase
 

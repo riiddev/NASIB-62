@@ -42,7 +42,7 @@ export class OnlineRoom {
     this.disposed = false;
     this.onUpdate = onUpdate;
     this.bridge = {
-      requestAction: (action) => this.requestAction(action),
+      requestAction: (action, payload) => this.requestAction(action, payload),
       disconnect: () => this.disconnect(),
     };
   }
@@ -216,11 +216,11 @@ export class OnlineRoom {
     this.emit();
   }
 
-  requestAction(action) {
+  requestAction(action, payload) {
     if (!ALLOWED_ACTIONS.has(action) || !this.started) return;
     if (this.slot < 0) return;
-    if (this.isHost) { void this.performHostAction(this.slot, action); return; }
-    void this.send('intent', { code: this.code, clientId: this.clientId, slot: this.slot, action })
+    if (this.isHost) { void this.performHostAction(this.slot, action, payload); return; }
+    void this.send('intent', { code: this.code, clientId: this.clientId, slot: this.slot, action, payload })
       .catch((error) => this.setStatus('Aksi belum terkirim.', error.message));
   }
 
@@ -228,14 +228,14 @@ export class OnlineRoom {
     if (!this.isHost || !this.started || payload.code && payload.code !== this.code || !ALLOWED_ACTIONS.has(payload.action)) return;
     const member = this.roster.find((p) => p.clientId === payload.clientId && p.slot === Number(payload.slot));
     if (!member || !window.NasibEngine?.canAct(member.slot)) return;
-    await this.performHostAction(member.slot, payload.action);
+    await this.performHostAction(member.slot, payload.action, payload.payload);
   }
 
-  async performHostAction(slot, action) {
+  async performHostAction(slot, action, payload) {
     const engine = window.NasibEngine;
     if (!this.isHost || !engine?.canAct(slot)) return;
     try {
-      const work = engine.performAction(action);
+      const work = engine.performAction(action, payload);
       // Broadcast the busy phase first so clients cannot queue duplicate clicks while dice/movement animate.
       await this.publishGameState();
       await work;
