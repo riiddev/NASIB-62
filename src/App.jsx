@@ -13,6 +13,29 @@ import OnlineLobby from './components/OnlineLobby.jsx';
 function LegacyFragment({ html, name }) { return <div className={'legacy-fragment legacy-fragment--' + name} dangerouslySetInnerHTML={{ __html: html }} />; }
 export default function App() {
  const [introVisible, setIntroVisible] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
- useEffect(() => { registerGSAP(); window.NasibAudio = NasibAudio; NasibAudio.mount(); bootLegacyApp(); }, []);
+ useEffect(() => {
+  registerGSAP();
+  window.NasibAudio = NasibAudio;
+  NasibAudio.mount();
+  bootLegacyApp();
+
+  // Load the landing-only motion layer after the engine has built its live markup.
+  // Keeping it in a separate chunk avoids increasing the game's initial JS bundle.
+  let cancelled = false;
+  let stopMotion = () => {};
+  import('./animation/landing-motion.js')
+    .then(({ initLandingMotion }) => {
+      if (cancelled) return;
+      stopMotion = initLandingMotion();
+    })
+    .catch((error) => {
+      console.error('[NASIB +62] Landing motion failed to initialize; static layout remains available.', error);
+    });
+
+  return () => {
+    cancelled = true;
+    stopMotion();
+  };
+ }, []);
  return <><LegacyFragment html={SharedMarkup} name="shared"/><LegacyFragment html={LandingMarkup} name="landing"/><LegacyFragment html={GameRoomMarkup} name="game-room"/><LegacyFragment html={ModalsMarkup} name="modals"/><LegacyFragment html={GuidebookMarkup} name="guidebook"/><SoundDock/><OnlineLobby/>{introVisible && <Suspense fallback={<div className="nasib-intro intro-loading" role="status"><span>NASIB <b>+62</b></span></div>}><IntroOverlay onComplete={() => setIntroVisible(false)} /></Suspense>}</>;
 }

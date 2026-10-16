@@ -324,3 +324,46 @@ body{background:#ECEBE7}
   #landing .btn,
   #landing .feat-btn{transition:none}
 }
+/* =========================================================
+   GERAK (dipakai bersama landing-motion.js)
+   ========================================================= */
+
+/* Lenis: smooth wheel scrolling, while native touch scroll stays untouched. */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-stopped{overflow:hidden}
+.lenis.lenis-smooth iframe{pointer-events:none}
+
+/* Header tucks away while scrolling down and returns when scrolling up. */
+.site-header{transition:background-color .3s,box-shadow .3s,transform .5s cubic-bezier(.22,1,.36,1)}
+.site-header.is-away{transform:translateY(-100%)}
+.site-header.is-away:focus-within{transform:none}
+
+/* Word-by-word section heading reveal. */
+#landing .sec-head h2 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.16em;margin-bottom:-.16em}
+#landing .sec-head h2 .w>span{display:inline-block;will-change:transform}
+
+/* Progress rule above the four how-to cards. */
+#landing .steps{position:relative;border-top:0}
+#landing .steps::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:rgba(255,255,255,.18);transform-origin:left center;transform:scaleX(var(--p,1))}
+
+/* Section panels overlap like paper sliding upward. */
+#landing .how,#landing .regions,#landing .footer{position:relative;margin-top:-32px;border-radius:32px 32px 0 0}
+#landing .how{z-index:1}
+#landing .regions{z-index:2}
+#landing .footer{z-index:3}
+#landing .how{padding-top:calc(clamp(88px,11vw,152px) + 16px)}
+#landing .regions{padding-top:calc(clamp(88px,11vw,152px) + 16px)}
+
+/* Feature panel slides from the direction of the selected tab. */
+#landing .stage-pane{transform:translateX(36px);transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1),visibility 0s .6s}
+#landing .stage-pane:has(~ .on){transform:translateX(-36px)}
+#landing .stage-pane.on{transform:none;transition-delay:0s}
+
+@media(max-width:640px){#landing .how,#landing .regions,#landing .footer{margin-top:-24px;border-radius:24px 24px 0 0}}
+@media(prefers-reduced-motion:reduce){
+  .site-header.is-away{transform:none}
+  #landing .stage-pane,#landing .stage-pane:has(~ .on){transform:none;transition:none}
+  #landing .sec-head h2 .w>span{will-change:auto}
+}
