@@ -367,3 +367,33 @@ html.lenis,html.lenis body{height:auto}
   #landing .stage-pane,#landing .stage-pane:has(~ .on){transform:none;transition:none}
   #landing .sec-head h2 .w>span{will-change:auto}
 }
+
+
+/* Compact footer: keep the credits, reduce its footprint. */
+#landing .footer{padding:clamp(34px,4vw,54px) var(--l-gutter) 18px}
+#landing .footer .big{font-size:clamp(34px,4.6vw,60px);line-height:1}
+#landing .footer .btn-primary{min-height:42px;padding:0 18px;font-size:13px}
+#landing .credits{margin-top:24px;padding-top:18px;gap:20px;grid-template-columns:minmax(0,.9fr) minmax(0,1.35fr) minmax(0,.8fr);font-size:12px;line-height:1.48}
+#landing .credits h4{margin-bottom:6px;font-size:12px}
+#landing .credits p{margin-bottom:5px}
+#landing .fine{margin-top:18px;font-size:11px;line-height:1.45}
+#landing .photo-credits{margin-top:2px}
+#landing .photo-credits>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;list-style:none;color:#fff;font-size:12px;font-weight:600;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.14)}
+#landing .photo-credits>summary::-webkit-details-marker{display:none}
+#landing .photo-credits>summary::after{content:'+';font-size:18px;line-height:1;color:rgba(255,255,255,.65)}
+#landing .photo-credits[open]>summary::after{content:'−'}
+#landing #photoCredits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px;margin-top:8px}
+#landing #photoCredits p{font-size:10px;line-height:1.4;overflow-wrap:anywhere;margin:0 0 6px}
+#landing #photoCredits p:last-child{grid-column:1/-1;padding-top:3px;color:rgba(255,255,255,.58)}
+@media(max-width:900px){#landing .footer{padding-top:38px}}
+@media(max-width:640px){
+  #landing .footer{padding:34px var(--l-gutter) 16px}
+  #landing .footer-top{gap:16px}
+  #landing .footer .big{font-size:clamp(32px,9vw,44px)}
+  #landing .credits{margin-top:20px;padding-top:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'assets tech' 'photos photos';gap:18px 16px}
+  #landing .credits>div:nth-child(1){grid-area:assets}
+  #landing .credits>div:nth-child(2){grid-area:photos}
+  #landing .credits>div:nth-child(3){grid-area:tech}
+  #landing #photoCredits{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+  #landing .fine{margin-top:14px}
+}
