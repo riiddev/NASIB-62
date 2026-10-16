@@ -431,4 +431,80 @@ diff --git a/src/legacy/engine.js b/src/legacy/engine.js
    $('#nameFields').addEventListener('keydown', (e) => { if (e.key === 'Enter') startGameFromSetup(); });
    // game room
    $('#backHome').addEventListener('click', () => { if (state.started && !state.ended && !window.confirm('Keluar dari permainan? Progres ronde ini akan hilang.')) return; leaveGame(); });
--  $('#cardContinue').addEventListener('c
+-  $('#cardContinue').addEventListener('click', () => { closeModal('cardModal'); state.cardOpen = false; renderAll(); if (getCurrentPlayer()?.isAI) scheduleComputerTurn(360); });
++  $('#cardContinue').addEventListener('click', () => {
++    if (onlineMode && window.NasibOnlineBridge?.requestAction) { window.NasibOnlineBridge.requestAction('card-continue'); return; }
++    closeModal('cardModal'); state.cardOpen = false; liveCard = null; renderAll(); if (getCurrentPlayer()?.isAI) scheduleComputerTurn(360);
++  });
+   $('#playAgain').addEventListener('click', () => { const names = state.players.map((p) => p.name); closeModal('gameOverModal'); openSetup(names); });
+   $('#homeAgain').addEventListener('click', () => { closeModal('gameOverModal'); leaveGame(); });
+   // guide
+@@ -1560,7 +1660,14 @@
+   // one delegated listener for actions, close buttons, and tile inspection
+   document.addEventListener('click', (e) => {
+     const action = e.target.closest('[data-action]');
+-    if (action) { if (!action.disabled) handleAction(action.dataset.action); return; }
++    if (action) {
++      if (!action.disabled) {
++        const targetIndex = action.dataset.index === undefined ? undefined : Number(action.dataset.index);
++        if (onlineMode && window.NasibOnlineBridge?.requestAction) window.NasibOnlineBridge.requestAction(action.dataset.action, targetIndex);
++        else handleAction(action.dataset.action, targetIndex);
++      }
++      return;
++    }
+     const close = e.target.closest('[data-close]');
+     if (close) { const m = modalStack.find((x) => x.id === close.dataset.close); if (!m || m.closable) closeModal(close.dataset.close); return; }
+     const tile = e.target.closest('.tile[data-tile]');
+@@ -1606,5 +1713,50 @@
+ window.addEventListener('error', (e) => { console.error('NASIB +62 error:', e.message); });
+ window.addEventListener('unhandledrejection', (e) => { console.error('NASIB +62 unhandled promise:', e.reason); });
+ init();
+-
+-}
++window.NasibEngine = {
++  isOnline: () => onlineMode,
++  getLocalSlot: () => onlineSlot,
++  getSnapshot() {
++    return {
++      players: state.players.map((p) => ({ id:p.id, name:p.name, token:p.token, color:p.color, money:p.money, pos:p.pos, jailed:p.jailed, jailTurns:p.jailTurns, alive:p.alive, isAI:p.isAI, aiDifficulty:p.aiDifficulty })),
++      current:state.current, turnCount:state.turnCount, round:state.round,
++      assets:state.assets.map((a) => a ? { ownerId:a.ownerId, houses:a.houses } : null),
++      awaiting:state.awaiting, busy:Boolean(state.busy), ended:state.ended, extraTurn:state.extraTurn,
++      doubleStreak:state.doubleStreak, pendingBuy:state.pendingBuy, cardOpen:state.cardOpen,
++      dice:[...state.dice], log:state.log.map((x) => ({...x})), lastRollText:state.lastRollText,
++      started:state.started, stateSeized:[...state.stateSeized], liveCard:liveCard ? JSON.parse(JSON.stringify(liveCard)) : null,
++    };
++  },
++  async startOnlineGame(names, slot = 0) {
++    onlineMode = true; onlineSlot = Math.max(0, Math.min(3, Number(slot) || 0));
++    const cleanNames = names.map((p) => typeof p === 'string' ? p : p.name).slice(0,4);
++    if (cleanNames.length < 2) throw new Error('Mabar membutuhkan minimal 2 pemain.');
++    beginGame(cleanNames);
++    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
++    return this.getSnapshot();
++  },
++  applySnapshot(snapshot) {
++    if (!snapshot || !Array.isArray(snapshot.players)) return false;
++    const localRunId = state.runId; const previousCardId = liveCard?.id || null;
++    Object.assign(state, snapshot, { runId:localRunId, busy:Boolean(snapshot.busy), stateSeized:new Set(snapshot.stateSeized || []) });
++    state.assets = (snapshot.assets || []).map((a) => a ? { ownerId:a.ownerId, houses:Number(a.houses) || 0 } : null);
++    liveCard = snapshot.liveCard ? JSON.parse(JSON.stringify(snapshot.liveCard)) : null;
++    if (state.cardOpen && liveCard && liveCard.id !== previousCardId) Hooks.showCard(liveCard.data, true);
++    if (!state.cardOpen) closeModal('cardModal');
++    Hooks.render();
++    return true;
++  },
++  async performAction(action, payload) {
++    if (action === 'roll') return await rollDice();
++    if (action === 'buy') return buyProperty();
++    if (action === 'skip-buy') { if (!state.busy && state.pendingBuy !== null) { state.pendingBuy = null; Hooks.render(); } return; }
++    if (action === 'build') return buildHouse(Number.isInteger(payload) ? payload : undefined);
++    if (action === 'continue') return continueTurn();
++    if (action === 'bail') return payBail();
++    if (action === 'card-continue') { if (state.cardOpen && !state.busy) { closeModal('cardModal'); state.cardOpen = false; liveCard = null; Hooks.render(); } return; }
++  },
++  canAct(slot) { return Boolean(state.started && !state.ended && !state.busy && state.current === Number(slot) && state.players[state.current]?.alive); },
++  leaveOnlineGame() { if (onlineMode && state.started) leaveGame(); else { onlineMode = false; onlineSlot = 0; liveCard = null; void window.NasibOnlineBridge?.disconnect?.(); } },
++};
++
++}
