@@ -255,3 +255,13 @@
 /* Keep the moved inspector exactly as wide as the board workspace. */
 #game .side>#inspector{max-width:min(100%,1240px,calc(100svh - 75px));}
 @media(max-width:820px){#game .side>#inspector{max-width:100%;}}
+
+/* On wide desktop/zoomed-out layouts, distribute the three major elements:
+   property inspector left, oversized board center, player ranking right. */
+@media(min-width:1600px){
+  #game .room{grid-template-columns:minmax(260px,320px) minmax(0,1fr) minmax(320px,370px);column-gap:clamp(18px,1.8vw,34px);align-items:start;}
+  #game .room>section{grid-column:2;grid-row:1;}
+  #game .side>.player-ranking-card{grid-column:3;grid-row:1;}
+  #game .side>#inspector{grid-column:1;grid-row:1;width:100%;max-width:none;justify-self:stretch;margin:0;}
+  #game .board-wrap{max-width:min(1240px,calc(100svh - 75px));}
+}
