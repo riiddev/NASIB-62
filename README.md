@@ -19,7 +19,8 @@ Build `npm run build`; pemeriksaan sintaks `npm run check`.
 
 ## Struktur
 ```text
-index.html
+app.html                       entry HTML sumber untuk development dan build
+index.html                     bundle publikasi GitHub Pages (dihasilkan otomatis)
 public/assets/                  gambar WebP yang dipisah dari HTML asli
 src/App.jsx                    shell React
 src/animation/gsap.js          GSAP bootstrap
@@ -40,7 +41,7 @@ Intro 5 detik menggunakan Remotion Player dalam browser. Sebelum rilis publik at
 
 ## GitHub Pages deployment
 
-The app is built by Vite and the workflow in `.github/workflows/deploy-pages.yml` uploads the compiled `dist/` artifact. To activate it once, open the repository **Settings → Pages → Build and deployment → Source** and select **GitHub Actions**. The repository integration cannot alter this setting automatically. Vite uses relative URLs (`base: './'`) so the `/NASIB-62/` project path is respected.
+The app source uses `app.html`; Vite builds it into `dist/`. The workflow then republishes the compiled entry and hashed assets to the repository root because GitHub Pages is currently configured to publish from the `main` branch root. No manual Settings change is required. The workflow also keeps all React/CSS/JS source files modular. Vite uses relative URLs (`base: './'`) so the `/NASIB-62/` project path is respected.
 
 ## Audio
 Efek lokal berbasis Web Audio API; ambience kota opsional. Voice memanfaatkan `SpeechSynthesis` ID jika ada di perangkat. Browser memerlukan interaksi pertama sebelum audio boleh aktif.

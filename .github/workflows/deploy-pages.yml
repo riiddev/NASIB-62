@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
@@ -26,27 +24,28 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
-      - name: Check game engine syntax
+      - name: Validate the game engine patch
         run: npm run check
       - name: Build production site
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
-      - name: Prepare Pages artifact
+      - name: Prepare Pages output
         run: node scripts/prepare-pages.mjs
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Publish compiled bundle to the branch-root Pages source
+        run: |
+          set -e
+          rm -f assets/index-*.js assets/index-*.css assets/app-*.js assets/app-*.css assets/realtime-*.js assets/IntroOverlay-*.js
+          cp dist/index.html index.html
+          cp dist/assets/* assets/
+          touch .nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A index.html .nojekyll assets/
+          if git diff --cached --quiet; then
+            echo "The published bundle is already up to date."
+          else
+            git commit -m "build: publish compiled NASIB +62 site"
+            git push origin HEAD:main
+          fi
