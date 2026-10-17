@@ -39,6 +39,20 @@ Satu pemain manusia melawan 1–3 AI. Pilih **STAF FRAKSI**, **ELIT KABINET**, a
 
 Keputusan bot kini dihitung oleh modul terpisah `src/ai/strategy.js`: mereka menilai rasio sewa/harga, kecukupan dana cadangan, peluang melengkapi wilayah, kesempatan menghambat set lawan, dan potensi kenaikan sewa dari rumah. Log permainan menampilkan alasan beli/lewat, bukan hanya pesan generik. Uji strategi dapat dijalankan dengan `npm test`; `npm run check` menjalankan tes ini bersama pemeriksaan patch engine.
 
+## UI mobile & pengujian gameplay
+
+Layar permainan memakai layout responsif: papan dibatasi agar tetap utuh di layar portrait, kontrol dadu/aksi tetap terjangkau di bilah bawah dengan safe-area iPhone/Android, dan panel chat mabar dapat dibuka-tutup agar tidak menutupi papan. Preferensi reduced-motion tetap dihormati.
+
+Pemeriksaan browser untuk alur beli properti → bangun rumah → bangkrut → pemenang berada di `tests/e2e/gameplay.spec.js`, termasuk pemeriksaan overflow dan ukuran tombol di viewport ponsel. Workflow GitHub Actions memasang Playwright sementara untuk menjalankannya. Untuk menjalankan lokal:
+
+```sh
+npm install --no-save --package-lock=false @playwright/test
+npx playwright install chromium
+npm run test:e2e
+```
+
+`npm run check` tetap menjalankan pemeriksaan patch engine dan unit test strategi AI.
+
 ## Catatan Remotion
 
 Intro 5 detik menggunakan Remotion Player dalam browser. Sebelum rilis publik atau penggunaan komersial, tinjau ketentuan lisensi Remotion yang berlaku untuk skala penggunaan proyek ini. Render MP4 belum termasuk dalam repo.
