@@ -26,7 +26,9 @@ Ada dua cara:
 
 ## Catatan keamanan dan batasan
 
-- Room memakai kode acak 8 karakter dan channel realtime publik agar teman dapat masuk tanpa akun. Siapa pun yang mengetahui kode dapat mencoba bergabung; bagikan kode hanya ke teman yang diajak.
-- Untuk game santai, host browser menjadi pemegang state dan menyiarkan perubahan ke pemain lain. Ini belum merupakan sistem anti-cheat kompetitif yang server-authoritative. Untuk kompetisi berperingkat atau hadiah, pindahkan validasi aksi dan state ke server/Edge Functions serta gunakan private channels dengan autentikasi dan aturan RLS.
+- Room memakai kode acak 8 karakter dan **channel realtime publik** supaya teman dapat masuk tanpa akun atau migrasi database. Kode itu adalah undangan, bukan mekanisme autentikasi. Bagikan hanya kepada teman yang diajak.
+- Validasi baru memeriksa bentuk roster, snapshot game, indeks petak, ukuran teks chat, dan format aksi sebelum data diterapkan. Identitas host di payload hanyalah pemeriksaan konsistensi sisi klien; itu **bukan bukti kriptografis identitas pengirim**.
+- Untuk mabar santai, host browser menjadi pemegang state dan menyiarkan perubahan ke pemain lain. Peserta jahat yang mengetahui kode room masih dapat mencoba memalsukan broadcast, meniru slot, atau mengganggu sesi. Jangan gunakan protokol ini untuk leaderboard kompetitif, taruhan, atau hadiah.
+- Sebelum membuat mode kompetitif, pindahkan validasi aksi dan state ke server/Edge Functions, autentikasikan pemain secara anonim atau dengan akun, gunakan private channels, dan buat kebijakan RLS berdasarkan membership room yang dibuat server. Dokumentasi resmi: [Supabase Realtime Authorization](https://supabase.com/docs/guides/realtime/authorization) dan [Broadcast](https://supabase.com/docs/guides/realtime/broadcast).
 - State pertandingan berada di browser host; refresh atau keluarnya host akan memutus sesi. Sistem ini belum menyediakan reconnection/resume setelah host menutup halaman.
 - Tidak semua browser menyediakan suara bahasa Indonesia; itu tetap bergantung pada perangkat.
