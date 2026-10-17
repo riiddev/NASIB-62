@@ -8,6 +8,15 @@ updates:
     labels:
       - "dependencies"
       - "security"
+    groups:
+      vite-toolchain:
+        patterns:
+          - "vite"
+          - "@vitejs/plugin-react"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
