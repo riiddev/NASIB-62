@@ -212,7 +212,10 @@ export class OnlineRoom {
     if (this.hostClientId && payload.hostId !== this.hostClientId) return;
     const roster = sanitizeRoster(payload.roster, payload.hostId);
     const snapshot = sanitizeGameSnapshot(payload.snapshot);
-    if (!roster || !snapshot) { this.setStatus('Data awal room tidak valid.'); return; }
+    if (!roster || !snapshot || roster.length !== snapshot.players.length || snapshot.players.some((player, index) => player.name !== roster[index].name)) {
+      this.setStatus('Data awal room tidak konsisten.');
+      return;
+    }
     const mine = roster.find((p) => p.clientId === this.clientId);
     if (!mine) { this.setStatus('Browser ini tidak terdaftar di room host.'); return; }
     this.hostClientId = payload.hostId;
@@ -232,7 +235,10 @@ export class OnlineRoom {
   receiveGameState(payload = {}) {
     if (this.isHost || !this.started || payload.code !== this.code || payload.hostId !== this.hostClientId) return;
     const snapshot = sanitizeGameSnapshot(payload.snapshot);
-    if (!snapshot) { this.setStatus('Update permainan tidak valid; state terakhir dipertahankan.'); return; }
+    if (!snapshot || snapshot.players.length !== this.roster.length || snapshot.players.some((player, index) => player.name !== this.roster[index].name)) {
+      this.setStatus('Update permainan tidak valid; state terakhir dipertahankan.');
+      return;
+    }
     if (!window.NasibEngine?.applySnapshot(snapshot)) { this.setStatus('Engine menolak update permainan.'); return; }
     this.status = snapshot.ended ? 'Permainan selesai.' : 'Mabar aktif — state terbaru diterima';
     this.emit();
