@@ -2,11 +2,12 @@ import { gsap } from 'gsap';
 
 /**
  * Gentle ambient camera drift for the existing illustration. It does not move
- * game pieces or mutate board state; reduced-motion preferences disable it.
+ * game pieces or mutate board state; reduced-motion preferences disable motion,
+ * but do not disable the phone orientation gate.
  */
 export function initSceneMotion() {
   if (window.__nasibSceneMotion) return () => {};
-  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return () => {};
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   const landing = document.getElementById('landing');
   const hero = landing?.querySelector('.hero');
@@ -27,7 +28,7 @@ export function initSceneMotion() {
     }
   }
 
-  const heroDrift = art ? gsap.fromTo(
+  const heroDrift = art && !reducedMotion ? gsap.fromTo(
     art,
     { objectPosition: '66% 57%' },
     {
@@ -41,28 +42,9 @@ export function initSceneMotion() {
   ) : null;
 
   let backgroundDrift = null;
-  const syncGameMotion = () => {
-    if (!game) return;
-    const active = !game.classList.contains('hidden');
-    if (active && !backgroundDrift) {
-      gsap.set(game, { '--nasib-scene-y': '0%' });
-      backgroundDrift = gsap.to(game, {
-        '--nasib-scene-y': '-1.35%',
-        duration: 18,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
-    } else if (!active && backgroundDrift) {
-      backgroundDrift.kill();
-      backgroundDrift = null;
-      gsap.set(game, { '--nasib-scene-y': '0%' });
-    }
-    syncOrientationGate();
-  };
-
   const orientationMedia = window.matchMedia('(max-width: 820px) and (orientation: portrait)');
   const orientationGuard = game?.querySelector('#orientationGuard');
+
   const syncOrientationGate = () => {
     if (!game) return;
     const blocked = !game.classList.contains('hidden') && orientationMedia.matches;
@@ -74,6 +56,26 @@ export function initSceneMotion() {
       document.querySelector('.online-game-dock'),
     ].filter(Boolean);
     roots.forEach((element) => { element.inert = blocked; });
+  };
+
+  const syncGameMotion = () => {
+    if (!game) return;
+    const active = !game.classList.contains('hidden');
+    if (active && !backgroundDrift && !reducedMotion) {
+      gsap.set(game, { '--nasib-scene-y': '0%' });
+      backgroundDrift = gsap.to(game, {
+        '--nasib-scene-y': '-1.35%',
+        duration: 18,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+    } else if ((!active || reducedMotion) && backgroundDrift) {
+      backgroundDrift.kill();
+      backgroundDrift = null;
+      gsap.set(game, { '--nasib-scene-y': '0%' });
+    }
+    syncOrientationGate();
   };
 
   const gameObserver = game ? new MutationObserver(syncGameMotion) : null;
