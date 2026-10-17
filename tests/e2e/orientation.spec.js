@@ -23,5 +23,5 @@ test('an active phone game requires landscape orientation and unlocks when rotat
   const board = await page.locator('#game .board-wrap').boundingBox();
   expect(board).not.toBeNull();
   expect(board.width).toBeGreaterThan(250);
-  expect(board.right).toBeLessThanOrEqual(668);
+  expect(board.x + board.width).toBeLessThanOrEqual(668);
 });
