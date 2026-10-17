@@ -7,4 +7,5 @@ import './styles/pentagon-online.css';
 import './styles/game-tabletop.css';
 import './styles/landing-premium.css';
 import './styles/dashboard-preview.css';
+import './styles/mobile-polish.css';
 createRoot(document.getElementById('root')).render(<App />);
