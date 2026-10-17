@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { isSafeClientId, isValidActionPayload, sanitizeGameSnapshot, sanitizeIncomingChat, sanitizeRoster } from './security.js';
 
 const ALLOWED_ACTIONS = new Set(['roll', 'buy', 'skip-buy', 'build', 'continue', 'bail', 'card-continue']);
 const MAX_PLAYERS = 4;
@@ -39,6 +40,9 @@ export class OnlineRoom {
     this.status = 'Menyiapkan koneksi…';
     this.error = '';
     this.lastRosterKey = '';
+    this.hostClientId = this.isHost ? this.clientId : null;
+    this.lastIntentAt = new Map();
+    this.lastChatAt = new Map();
     this.disposed = false;
     this.onUpdate = onUpdate;
     this.bridge = {
@@ -155,6 +159,10 @@ export class OnlineRoom {
   async publishLobby() {
     if (!this.isHost || !this.connected || this.started) return;
     try {
+      const roster = sanitizeRoster(this.roster, this.clientId);
+      if (!roster) throw new Error('Roster room tidak valid. Muat ulang room dan coba lagi.');
+      this.roster = roster;
+      this.hostClientId = this.clientId;
       await this.send('lobby-state', { code: this.code, roster: this.roster, hostId: this.clientId, maxPlayers: MAX_PLAYERS });
       this.status = this.roster.length > 1 ? 'Teman sudah masuk. Siap mulai.' : 'Bagikan kode room ke temanmu.';
       this.emit();
@@ -162,8 +170,11 @@ export class OnlineRoom {
   }
 
   receiveLobby(payload = {}) {
-    if (this.isHost || this.started || payload.code !== this.code || !Array.isArray(payload.roster)) return;
-    this.roster = payload.roster.slice(0, MAX_PLAYERS).map((p, slot) => ({ ...p, slot }));
+    if (this.isHost || this.started || payload.code !== this.code) return;
+    const roster = sanitizeRoster(payload.roster, payload.hostId);
+    if (!roster) return;
+    this.hostClientId = payload.hostId;
+    this.roster = roster;
     const mine = this.roster.find((p) => p.clientId === this.clientId);
     if (mine) { this.slot = mine.slot; this.status = this.roster.length > 1 ? 'Lobby tersambung. Menunggu host memulai.' : 'Menunggu teman bergabung…'; }
     else { this.slot = -1; this.status = 'Room sudah penuh (maksimum 4 pemain).'; }
@@ -172,17 +183,20 @@ export class OnlineRoom {
 
   async startGame() {
     if (!this.isHost || this.started) throw new Error('Hanya host yang dapat memulai permainan.');
-    this.roster = this.presenceRoster();
-    if (this.roster.length < 2) throw new Error('Butuh minimal 2 pemain di room sebelum mulai.');
-    if (this.roster.length > MAX_PLAYERS) throw new Error('Room maksimum 4 pemain.');
+    const roster = sanitizeRoster(this.presenceRoster(), this.clientId);
+    if (!roster || roster.length < 2) throw new Error('Butuh minimal 2 pemain valid di room sebelum mulai.');
+    if (roster.length > MAX_PLAYERS) throw new Error('Room maksimum 4 pemain.');
+    this.roster = roster;
+    this.hostClientId = this.clientId;
     const engine = window.NasibEngine;
     if (!engine) throw new Error('Game engine belum siap. Muat ulang halaman.');
     this.started = true;
     this.status = 'Memulai permainan online…';
     this.emit();
     try {
-      const snapshot = await engine.startOnlineGame(this.roster.map((p) => p.name), 0);
-      await this.send('game-start', { code: this.code, roster: this.roster, snapshot });
+      const snapshot = sanitizeGameSnapshot(await engine.startOnlineGame(this.roster.map((p) => p.name), 0));
+      if (!snapshot) throw new Error('Engine menghasilkan state awal yang tidak valid.');
+      await this.send('game-start', { code: this.code, hostId: this.clientId, roster: this.roster, snapshot });
       await this.publishGameState();
       this.status = 'Mabar aktif — semua aksi disinkronkan';
       this.emit();
@@ -194,46 +208,57 @@ export class OnlineRoom {
   }
 
   async receiveGameStart(payload = {}) {
-    if (this.isHost || this.started || payload.code !== this.code || !Array.isArray(payload.roster) || !payload.snapshot) return;
-    this.started = true;
-    this.roster = payload.roster.slice(0, MAX_PLAYERS).map((p, slot) => ({ ...p, slot }));
-    const mine = this.roster.find((p) => p.clientId === this.clientId);
-    if (!mine) { this.status = 'Nama browser ini tidak ada di room host.'; this.emit(); return; }
+    if (this.isHost || this.started || payload.code !== this.code) return;
+    if (this.hostClientId && payload.hostId !== this.hostClientId) return;
+    const roster = sanitizeRoster(payload.roster, payload.hostId);
+    const snapshot = sanitizeGameSnapshot(payload.snapshot);
+    if (!roster || !snapshot) { this.setStatus('Data awal room tidak valid.'); return; }
+    const mine = roster.find((p) => p.clientId === this.clientId);
+    if (!mine) { this.setStatus('Browser ini tidak terdaftar di room host.'); return; }
+    this.hostClientId = payload.hostId;
+    this.roster = roster;
     this.slot = mine.slot;
+    this.started = true;
     try {
       const engine = window.NasibEngine;
+      if (!engine) throw new Error('Game engine belum siap. Muat ulang halaman.');
       await engine.startOnlineGame(this.roster.map((p) => p.name), this.slot);
-      engine.applySnapshot(payload.snapshot);
+      if (!engine.applySnapshot(snapshot)) throw new Error('State pertandingan ditolak oleh engine.');
       this.status = 'Mabar aktif — giliranmu akan muncul di papan';
       this.emit();
-    } catch (error) { this.setStatus('Tidak bisa membuka papan online.', error.message); }
+    } catch (error) { this.started = false; this.setStatus('Tidak bisa membuka papan online.', String(error?.message || '').slice(0, 240)); }
   }
 
   receiveGameState(payload = {}) {
-    if (this.isHost || !this.started || payload.code !== this.code || !payload.snapshot) return;
-    window.NasibEngine?.applySnapshot(payload.snapshot);
-    this.status = payload.snapshot.ended ? 'Permainan selesai.' : 'Mabar aktif — state terbaru diterima';
+    if (this.isHost || !this.started || payload.code !== this.code || payload.hostId !== this.hostClientId) return;
+    const snapshot = sanitizeGameSnapshot(payload.snapshot);
+    if (!snapshot) { this.setStatus('Update permainan tidak valid; state terakhir dipertahankan.'); return; }
+    if (!window.NasibEngine?.applySnapshot(snapshot)) { this.setStatus('Engine menolak update permainan.'); return; }
+    this.status = snapshot.ended ? 'Permainan selesai.' : 'Mabar aktif — state terbaru diterima';
     this.emit();
   }
 
   requestAction(action, payload) {
-    if (!ALLOWED_ACTIONS.has(action) || !this.started) return;
-    if (this.slot < 0) return;
+    if (!this.started || this.slot < 0 || !isValidActionPayload(action, payload)) return;
     if (this.isHost) { void this.performHostAction(this.slot, action, payload); return; }
     void this.send('intent', { code: this.code, clientId: this.clientId, slot: this.slot, action, payload })
-      .catch((error) => this.setStatus('Aksi belum terkirim.', error.message));
+      .catch(() => this.setStatus('Aksi belum terkirim. Periksa koneksi room.'));
   }
 
   async receiveIntent(payload = {}) {
-    if (!this.isHost || !this.started || payload.code && payload.code !== this.code || !ALLOWED_ACTIONS.has(payload.action)) return;
+    if (!this.isHost || !this.started || payload.code !== this.code || !isSafeClientId(payload.clientId) || !isValidActionPayload(payload.action, payload.payload)) return;
     const member = this.roster.find((p) => p.clientId === payload.clientId && p.slot === Number(payload.slot));
     if (!member || !window.NasibEngine?.canAct(member.slot)) return;
+    const now = Date.now();
+    const previousIntent = this.lastIntentAt.get(member.clientId) || 0;
+    if (now - previousIntent < ACTION_RATE_LIMIT_MS) return;
+    this.lastIntentAt.set(member.clientId, now);
     await this.performHostAction(member.slot, payload.action, payload.payload);
   }
 
   async performHostAction(slot, action, payload) {
     const engine = window.NasibEngine;
-    if (!this.isHost || !engine?.canAct(slot)) return;
+    if (!this.isHost || !isValidActionPayload(action, payload) || !engine?.canAct(slot)) return;
     try {
       const work = engine.performAction(action, payload);
       // Broadcast the busy phase first so clients cannot queue duplicate clicks while dice/movement animate.
@@ -248,25 +273,37 @@ export class OnlineRoom {
 
   async publishGameState() {
     if (!this.isHost || !this.started || !window.NasibEngine) return;
-    await this.send('game-state', { code: this.code, snapshot: window.NasibEngine.getSnapshot() });
+    const snapshot = sanitizeGameSnapshot(window.NasibEngine.getSnapshot());
+    if (!snapshot) throw new Error('Engine menghasilkan state permainan yang tidak valid.');
+    await this.send('game-state', { code: this.code, hostId: this.clientId, snapshot });
   }
 
   sendChat(text) {
-    const clean = String(text || '').trim().slice(0, MAX_CHAT_LENGTH);
+    const clean = typeof text === 'string' ? text.trim().slice(0, MAX_CHAT_LENGTH) : '';
     if (!clean || !this.connected) return;
-    const message = { id: makeClientId(), name: this.name, text: clean, time: new Date().toISOString() };
+    const now = Date.now();
+    const previous = this.lastChatAt.get(this.clientId) || 0;
+    if (now - previous < CHAT_RATE_LIMIT_MS) return;
+    this.lastChatAt.set(this.clientId, now);
+    const message = { id: makeClientId(), name: this.name, text: clean, time: new Date(now).toISOString() };
     this.messages = [...this.messages, message].slice(-40);
     this.emit();
-    void this.send('chat', { code: this.code, message }).catch((error) => this.setStatus('Chat gagal terkirim.', error.message));
+    void this.send('chat', { code: this.code, clientId: this.clientId, message })
+      .catch(() => this.setStatus('Chat gagal terkirim. Periksa koneksi room.'));
   }
   receiveChat(payload = {}) {
-    if (payload.code !== this.code || !payload.message?.id || payload.message.name === this.name && this.messages.some((m) => m.id === payload.message.id)) return;
-    if (this.messages.some((m) => m.id === payload.message.id)) return;
-    this.messages = [...this.messages, payload.message].slice(-40);
+    if (payload?.clientId === this.clientId) return;
+    const message = sanitizeIncomingChat(payload, this.code, this.roster);
+    if (!message || this.messages.some((entry) => entry.id === message.id)) return;
+    const now = Date.now();
+    const previous = this.lastChatAt.get(payload.clientId) || 0;
+    if (now - previous < CHAT_RATE_LIMIT_MS) return;
+    this.lastChatAt.set(payload.clientId, now);
+    this.messages = [...this.messages, message].slice(-40);
     this.emit();
   }
   receiveHostLeft(payload = {}) {
-    if (payload.code !== this.code || this.isHost) return;
+    if (payload.code !== this.code || payload.hostId !== this.hostClientId || this.isHost) return;
     this.setStatus('Host meninggalkan room. Sesi online ditutup.');
     void this.disconnect({ notifyHostLeft: false });
   }
@@ -274,7 +311,7 @@ export class OnlineRoom {
   async disconnect({ notifyHostLeft = true } = {}) {
     if (this.disposed) return;
     if (this.isHost && this.connected && notifyHostLeft) {
-      await this.send('host-left', { code: this.code }).catch(() => {});
+      await this.send('host-left', { code: this.code, hostId: this.clientId }).catch(() => {});
     }
     this.disposed = true;
     this.connected = false;
