@@ -28,18 +28,7 @@ export function initSceneMotion() {
     }
   }
 
-  const heroDrift = art && !reducedMotion ? gsap.fromTo(
-    art,
-    { objectPosition: '66% 57%' },
-    {
-      objectPosition: '73% 63%',
-      duration: 24,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-      overwrite: false,
-    },
-  ) : null;
+  // Hero camera travel lives in CSS so it also works if GSAP is delayed or fails.
 
   let backgroundDrift = null;
   const orientationMedia = window.matchMedia('(max-width: 820px) and (orientation: portrait)');
@@ -91,7 +80,6 @@ export function initSceneMotion() {
     orientationMedia.removeEventListener?.('change', syncOrientationGate);
     window.removeEventListener('orientationchange', syncOrientationGate);
     window.removeEventListener('resize', syncOrientationGate);
-    heroDrift?.kill();
     backgroundDrift?.kill();
     if (game) {
       gsap.set(game, { '--nasib-scene-y': '0%' });

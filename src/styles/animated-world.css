@@ -4,7 +4,9 @@
   isolation: isolate;
 }
 #landing .hero-art {
-  will-change: object-position;
+  /* Deliberately visible camera travel: the illustration itself moves, not just a faint overlay. */
+  will-change: object-position, filter;
+  animation: nasib-hero-camera 9s cubic-bezier(.45, 0, .55, 1) infinite alternate;
 }
 #landing .hero::after {
   content: "";
@@ -15,10 +17,16 @@
   background:
     radial-gradient(ellipse at 78% 24%, rgba(255, 246, 193, .18), transparent 35%),
     linear-gradient(112deg, transparent 37%, rgba(255, 255, 255, .18) 49%, transparent 60%);
-  background-size: 100% 100%, 260% 100%;
-  background-position: center, -145% 0;
+  background-size: 100% 100%, 210% 100%;
+  background-position: center, -110% 0;
   mix-blend-mode: screen;
-  animation: nasib-city-light 16s ease-in-out infinite alternate;
+  opacity: .78;
+  animation: nasib-city-light 8s ease-in-out infinite alternate;
+}
+@keyframes nasib-hero-camera {
+  0% { object-position: 56% 64%; filter: saturate(1) brightness(1); }
+  50% { object-position: 82% 52%; filter: saturate(1.12) brightness(1.04); }
+  100% { object-position: 66% 60%; filter: saturate(1.04) brightness(1.015); }
 }
 #landing .hero-inner { z-index: 3; }
 @keyframes nasib-city-light {
@@ -41,12 +49,13 @@
     linear-gradient(100deg, rgba(18, 27, 45, .66), rgba(18, 27, 45, .47) 48%, rgba(18, 27, 45, .72)),
     var(--nasib-world-art, none);
   background-size: cover;
-  background-position: center, 72% 43%;
+  background-position: center, 68% 56%;
   background-repeat: no-repeat;
-  opacity: .48;
-  filter: saturate(.78);
-  transform: translate3d(0, var(--nasib-scene-y), 0) scale(1.06);
+  opacity: .62;
+  filter: saturate(.92);
+  transform: translate3d(0, var(--nasib-scene-y), 0) scale(1.09);
   transform-origin: center center;
+  animation: nasib-game-camera 12s cubic-bezier(.45, 0, .55, 1) infinite alternate;
   will-change: transform, background-position;
 }
 #game.game:not(.hidden)::after {
@@ -67,8 +76,12 @@
   z-index: 1;
 }
 @keyframes nasib-tabletop-light {
-  0% { background-position: 0 0, 100% 100%; opacity: .55; }
+  0% { background-position: 0 0, 100% 100%; opacity: .4; }
   100% { background-position: 100% 60%, 0 20%; opacity: 1; }
+}
+@keyframes nasib-game-camera {
+  0% { background-position: center, 62% 48%; }
+  100% { background-position: center, 84% 58%; }
 }
 
 /* A phone in portrait gets an accessible rotate-to-play prompt. */
@@ -197,6 +210,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   #landing .hero::after,
+  #landing .hero-art,
+  #game.game:not(.hidden)::before,
   #game.game:not(.hidden)::after,
   .orientation-phone { animation: none !important; }
   #landing .hero-art { will-change: auto; }
