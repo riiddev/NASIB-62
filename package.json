@@ -7,8 +7,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build && node scripts/prepare-pages.mjs",
     "preview": "vite preview --host 0.0.0.0",
-    "check": "node scripts/check-engine-patch.mjs",
-    "build:pages": "npm run build"
+    "check": "node scripts/check-engine-patch.mjs && node --test src/ai/strategy.test.js",
+    "build:pages": "npm run build",
+    "test": "node --test src/ai/strategy.test.js"
   },
   "dependencies": {
     "@remotion/player": "^4.0.528",
