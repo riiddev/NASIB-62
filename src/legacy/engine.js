@@ -1,3 +1,4 @@
+import { calculateAIReserve, evaluatePropertyPurchase, evaluateHouseInvestment } from '../ai/strategy.js';
 
 export function bootLegacyApp() {
 'use strict';
@@ -630,11 +631,42 @@ function handleAction(action) {
 /* Computer opponents: use the same local game actions/rules; never control dice outcome. */
 const AI_THINKING_LINES={staff:['Meninjau berkas pengadaan...','Menghitung anggaran dasar...','Menunggu arahan fraksi...'],cabinet:['Menganalisis kelayakan aset...','Menjaga disiplin likuiditas...','Mengevaluasi potensi pendapatan sewa...'],oligarch:['Menghitung konsentrasi aset...','Memetakan risiko pasar...','Menetapkan strategi akuisisi...']};
 const waitAI=(ms)=>new Promise(resolve=>setTimeout(resolve,ms));
-function aiReserve(p){const l=AI_LEVELS[p.aiDifficulty]||AI_LEVELS.cabinet;return Math.min(Math.max(300000,p.money*.22),l.reserve);}
-function aiShouldBuy(p,i){const t=BOARD[i];if(!t||t.type!=='property'||state.assets[i]?.ownerId||p.money<t.price)return false;const cash=p.money-t.price,l=AI_LEVELS[p.aiDifficulty]||AI_LEVELS.cabinet,region=BOARD.map((t,i)=>({t,i})).filter(x=>x.t.type==='property'&&x.t.region===t.region),own=region.filter(x=>state.assets[x.i]?.ownerId===p.id).length,complete=own===region.length-1,roi=t.rent/Math.max(1,t.price),rivals=region.filter(x=>state.assets[x.i]?.ownerId&&state.assets[x.i].ownerId!==p.id).length,value=roi+(complete?.12:0)+rivals*.012,reserve=aiReserve(p);if(p.aiDifficulty==='staff')return cash>=350000&&(complete||value>=l.threshold);if(p.aiDifficulty==='oligarch')return cash>=Math.max(250000,reserve*.6)&&(complete||value>=l.threshold);return cash>=reserve&&(complete||value>=l.threshold);}
-function aiShouldBuild(p){if(!canBuildAtCurrent()||p.money<HOUSE_COST)return false;const l=AI_LEVELS[p.aiDifficulty]||AI_LEVELS.cabinet,t=BOARD[p.pos],a=state.assets[p.pos];if(p.money-HOUSE_COST<Math.max(250000,aiReserve(p)*(p.aiDifficulty==='oligarch'?.5:1)))return false;return t.rent*1.2/HOUSE_COST>=l.threshold&&(a.houses<1||p.aiDifficulty==='oligarch'||(p.aiDifficulty==='cabinet'&&state.round>2));}
+function aiReserve(p) {
+  return calculateAIReserve(p, AI_LEVELS[p.aiDifficulty] || AI_LEVELS.cabinet);
+}
+function aiPurchaseDecision(p, i) {
+  return evaluatePropertyPurchase({
+    player: p,
+    tile: BOARD[i],
+    index: i,
+    board: BOARD,
+    assets: state.assets,
+    profile: AI_LEVELS[p.aiDifficulty] || AI_LEVELS.cabinet,
+    difficulty: p.aiDifficulty,
+    reserve: aiReserve(p),
+  });
+}
+function aiShouldBuy(p, i) { return aiPurchaseDecision(p, i).shouldBuy; }
+function aiShouldBuild(p) {
+  if (!canBuildAtCurrent()) return false;
+  const index = p?.pos;
+  const tile = BOARD[index];
+  const asset = state.assets[index];
+  return evaluateHouseInvestment({
+    player: p,
+    tile,
+    asset,
+    profile: AI_LEVELS[p.aiDifficulty] || AI_LEVELS.cabinet,
+    difficulty: p.aiDifficulty,
+    reserve: aiReserve(p),
+    houseCost: HOUSE_COST,
+    maxHouses: MAX_HOUSES,
+    completeRegion: Boolean(tile?.region && regionComplete(p.id, tile.region)),
+    round: state.round,
+  }).shouldBuild;
+}
 function scheduleComputerTurn(delay=420){if(aiTimer)clearTimeout(aiTimer);const token=++aiScheduleToken,runId=state.runId,p=getCurrentPlayer();if(!state.started||state.ended||!p?.alive||!p.isAI)return;aiTimer=setTimeout(()=>runComputerTurn(token,runId),delay);}
-async function runComputerTurn(token,runId){if(aiRunning||token!==aiScheduleToken||runId!==state.runId)return;const p=getCurrentPlayer();if(!state.started||state.ended||!p?.alive||!p.isAI)return;if(state.busy||state.cardOpen){scheduleComputerTurn(300);return;}aiRunning=true;try{const l=AI_LEVELS[p.aiDifficulty]||AI_LEVELS.cabinet;if(!state.awaiting){const arr=AI_THINKING_LINES[p.aiDifficulty]||AI_THINKING_LINES.cabinet,line=arr[(state.turnCount+p.pos+p.id.length)%arr.length];state.lastRollText=line;Hooks.render();window.NasibAudio?.speak(line,p.aiDifficulty);await waitAI(l.think);if(token!==aiScheduleToken||runId!==state.runId||getCurrentPlayer()?.id!==p.id)return;if(p.jailed&&p.money-JAIL_BAIL>=Math.max(500000,aiReserve(p)))payBail();else await rollDice();}if(token!==aiScheduleToken||runId!==state.runId||getCurrentPlayer()?.id!==p.id)return;if(state.cardOpen||state.busy||state.ended)return;if(state.pendingBuy!==null){const i=state.pendingBuy;if(aiShouldBuy(p,i)){addLog(p.name+' menyetujui akuisisi '+BOARD[i].name+' ('+l.label+').','good');buyProperty();}else{addLog(p.name+' melewatkan akuisisi '+BOARD[i].name+' untuk menjaga likuiditas.','normal');state.pendingBuy=null;Hooks.render();}await waitAI(260);}if(state.awaiting&&!state.pendingBuy&&!state.cardOpen&&!state.busy&&!state.ended){if(aiShouldBuild(p)){addLog(p.name+' memutuskan investasi rumah berdasarkan nilai sewa.','good');buildHouse();await waitAI(260);}if(state.awaiting&&!state.cardOpen&&!state.busy&&!state.ended)continueTurn();}}catch(err){console.error('NASIB +62 AI turn error:',err);if(runId===state.runId&&getCurrentPlayer()?.id===p.id&&state.awaiting&&!state.busy&&!state.cardOpen&&!state.ended)continueTurn();}finally{aiRunning=false;if(runId===state.runId&&state.started&&!state.ended&&getCurrentPlayer()?.isAI&&!state.cardOpen&&!state.busy)scheduleComputerTurn(360);}}
+async function runComputerTurn(token,runId){if(aiRunning||token!==aiScheduleToken||runId!==state.runId)return;const p=getCurrentPlayer();if(!state.started||state.ended||!p?.alive||!p.isAI)return;if(state.busy||state.cardOpen){scheduleComputerTurn(300);return;}aiRunning=true;try{const l=AI_LEVELS[p.aiDifficulty]||AI_LEVELS.cabinet;if(!state.awaiting){const arr=AI_THINKING_LINES[p.aiDifficulty]||AI_THINKING_LINES.cabinet,line=arr[(state.turnCount+p.pos+p.id.length)%arr.length];state.lastRollText=line;Hooks.render();window.NasibAudio?.speak(line,p.aiDifficulty);await waitAI(l.think);if(token!==aiScheduleToken||runId!==state.runId||getCurrentPlayer()?.id!==p.id)return;if(p.jailed&&p.money-JAIL_BAIL>=Math.max(500000,aiReserve(p)))payBail();else await rollDice();}if(token!==aiScheduleToken||runId!==state.runId||getCurrentPlayer()?.id!==p.id)return;if(state.cardOpen||state.busy||state.ended)return;if(state.pendingBuy!==null){const i=state.pendingBuy;const decision=aiPurchaseDecision(p,i);if(decision.shouldBuy){addLog(p.name+' menyetujui akuisisi '+BOARD[i].name+': '+decision.reason+' ('+l.label+').','good');buyProperty();}else{addLog(p.name+' melewatkan akuisisi '+BOARD[i].name+': '+decision.reason+'.','normal');state.pendingBuy=null;Hooks.render();}await waitAI(260);}if(state.awaiting&&!state.pendingBuy&&!state.cardOpen&&!state.busy&&!state.ended){if(aiShouldBuild(p)){addLog(p.name+' memutuskan investasi rumah berdasarkan nilai sewa.','good');buildHouse();await waitAI(260);}if(state.awaiting&&!state.cardOpen&&!state.busy&&!state.ended)continueTurn();}}catch(err){console.error('NASIB +62 AI turn error:',err);if(runId===state.runId&&getCurrentPlayer()?.id===p.id&&state.awaiting&&!state.busy&&!state.cardOpen&&!state.ended)continueTurn();}finally{aiRunning=false;if(runId===state.runId&&state.started&&!state.ended&&getCurrentPlayer()?.isAI&&!state.cardOpen&&!state.busy)scheduleComputerTurn(360);}}
 
 /* =========================================================
    6. RENDERING — board, pawns, panels
