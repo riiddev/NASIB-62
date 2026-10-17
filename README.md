@@ -4,7 +4,8 @@ Boardgame ekonomi satir tentang uang, tanah, dan kejutan hidup sehari-hari. UI m
 
 ## Stack
 - React + Vite untuk komposisi UI.
-- GSAP via npm untuk animasi.
+- GSAP via npm untuk animasi landing dan feedback mikro saat giliran/aksi game.
+- CSP, response security headers di Vercel, validasi payload realtime, serta audit dependensi dan tes regresi di GitHub Actions.
 - Remotion Player untuk intro deterministik 5 detik (150 frame @ 30 fps) di browser, bukan MP4 terpisah.
 - Web Audio API untuk SFX dadu/transaksi/kartu/kemenangan, dan Speech Synthesis jika voice Indonesia tersedia.
 - CSS responsif dan ilustrasi lokal di `public/assets/`.
@@ -43,7 +44,7 @@ Keputusan bot kini dihitung oleh modul terpisah `src/ai/strategy.js`: mereka men
 
 Layar permainan memakai layout responsif: papan dibatasi agar tetap utuh di layar portrait, kontrol dadu/aksi tetap terjangkau di bilah bawah dengan safe-area iPhone/Android, dan panel chat mabar dapat dibuka-tutup agar tidak menutupi papan. Preferensi reduced-motion tetap dihormati.
 
-Pemeriksaan browser untuk alur beli properti → bangun rumah → bangkrut → pemenang berada di `tests/e2e/gameplay.spec.js`, termasuk pemeriksaan overflow dan ukuran tombol di viewport ponsel. Workflow GitHub Actions memasang Playwright sementara untuk menjalankannya. Untuk menjalankan lokal:
+Pemeriksaan browser untuk alur beli properti → bangun rumah → bangkrut → pemenang berada di `tests/e2e/gameplay.spec.js`, termasuk pemeriksaan overflow dan ukuran tombol di viewport ponsel. Workflow GitHub Actions menjalankan unit tests, audit npm, production build, serta tes browser. Playwright dikunci ke versi 1.64.1 di workflow agar runner tidak berubah diam-diam. Untuk menjalankan lokal:
 
 ```sh
 npm install --no-save --package-lock=false @playwright/test
@@ -81,3 +82,12 @@ Untuk menghindari rewrite berisiko, engine game masih menggunakan DOM selector y
 - Mabar memakai Supabase Realtime (presence + broadcast) dengan host sebagai pemegang state game; tidak perlu akun pemain. Untuk menanam koneksi ke website publik, buat Supabase project, ambil Project URL serta anon/publishable key, lalu tambahkan GitHub repository Variables `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY`. Jalankan workflow deploy setelah variables tersedia. Jangan pernah memakai `service_role` key di browser. Tanpa values tersebut, fitur lobby tetap tampil namun tidak dapat terhubung ke room realtime.
 
 Panduan pengaktifan realtime: [`docs/ONLINE_MULTIPLAYER.md`](docs/ONLINE_MULTIPLAYER.md).
+
+
+## Security & launch gates
+
+- `src/online/security.js` memvalidasi roster, snapshot, chat dan action payload yang datang dari Realtime; cakupan regresinya berada di `src/online/security.test.js`.
+- `SECURITY.md` mendokumentasikan penanganan key dan threat model. Mode mabar tetap untuk game kasual; broadcast publik tanpa otorisasi server-side bukan sistem anti-cheat.
+- `app.html` memberi CSP dasar untuk kedua jalur hosting, sedangkan `vercel.json` menambahkan response security headers untuk deployment Vercel.
+- GitHub Actions menjalankan `npm audit --audit-level=high`, unit tests, build dan Playwright. Jangan launch selama audit/security workflow gagal atau masih memiliki temuan high/critical yang belum ditinjau.
+
