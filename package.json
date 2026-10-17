@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "check": "node scripts/check-engine-patch.mjs && node --test src/ai/strategy.test.js",
     "build:pages": "npm run build",
-    "test": "node --test src/ai/strategy.test.js"
+    "test": "node --test src/ai/strategy.test.js",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@remotion/player": "^4.0.528",
