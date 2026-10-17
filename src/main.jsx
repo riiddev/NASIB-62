@@ -8,4 +8,5 @@ import './styles/game-tabletop.css';
 import './styles/landing-premium.css';
 import './styles/dashboard-preview.css';
 import './styles/mobile-polish.css';
+import './styles/motion-polish.css';
 createRoot(document.getElementById('root')).render(<App />);
