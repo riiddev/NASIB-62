@@ -1,0 +1,36 @@
+/* Motion polish: animation adds feedback but never alters board geometry. */
+#game .tile {
+  -webkit-tap-highlight-color: transparent;
+}
+#game .tile.is-current {
+  animation: nasib-tile-arrive 380ms cubic-bezier(.22,1,.36,1) both;
+}
+#game .core-actions .btn:focus-visible,
+#game .dock .core-actions .btn:focus-visible {
+  outline: 3px solid #b44732;
+  outline-offset: 3px;
+}
+#game .core-actions .btn:active:not(:disabled),
+#game .dock .core-actions .btn:active:not(:disabled) {
+  filter: brightness(.97);
+}
+#game .tile:focus-visible {
+  z-index: 8;
+  outline: 3px solid #b44732;
+  outline-offset: 2px;
+}
+@keyframes nasib-tile-arrive {
+  0% { filter: brightness(.96); }
+  45% { filter: brightness(1.13); }
+  100% { filter: brightness(1.04); }
+}
+@media (hover: hover) and (pointer: fine) {
+  #game .tile { transition: filter 180ms ease, box-shadow 180ms ease; }
+  #game .tile:hover { filter: brightness(1.055) saturate(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #game .tile.is-current { animation: none !important; }
+  #game .tile,
+  #game .core-actions .btn,
+  #game .dock .core-actions .btn { transition: none !important; }
+}
