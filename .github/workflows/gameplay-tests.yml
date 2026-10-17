@@ -28,8 +28,10 @@ jobs:
           cache: npm
       - name: Install project dependencies
         run: npm ci
+      - name: Audit direct and transitive npm dependencies
+        run: npm audit --audit-level=high
       - name: Install browser test runner without changing project dependencies
-        run: npm install --no-save --package-lock=false @playwright/test
+        run: npm install --no-save --package-lock=false @playwright/test@1.64.1
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Validate AI and engine patch
