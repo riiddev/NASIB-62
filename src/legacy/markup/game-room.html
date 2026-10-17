@@ -1,5 +1,14 @@
 <!-- ===================== GAME ROOM ===================== -->
 <main id="game" class="game hidden" aria-label="Ruang permainan">
+  <div class="orientation-guard" id="orientationGuard" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="orientationTitle" aria-describedby="orientationDescription">
+    <div class="orientation-card">
+      <div class="orientation-phone" aria-hidden="true"><span></span></div>
+      <p class="orientation-kicker">MODE SELULER</p>
+      <h2 id="orientationTitle">Putar HP ke posisi lanskap</h2>
+      <p id="orientationDescription">Papan NASIB +62 dirancang lebar. Putar layar ke samping agar papan, saldo, dan tombol aksi tampil utuh.</p>
+      <p class="orientation-footnote">Permainan akan terbuka otomatis saat layar sudah lanskap.</p>
+    </div>
+  </div>
   <div class="topbar">
     <button class="iconbtn" id="backHome" type="button" aria-label="Kembali ke beranda"><svg><use href="#i-home"/></svg><span>Beranda</span></button>
     <span class="brand-name">NASIB <b style="color:var(--red-2)">+62</b></span>
@@ -46,4 +55,3 @@
     </aside>
   </div>
 </main>
-
