@@ -24,6 +24,7 @@ export default function App() {
   let cancelled = false;
   let stopMotion = () => {};
   let stopDashboardPreview = () => {};
+  let stopGameMotion = () => {};
   import('./animation/landing-motion.js')
     .then(({ initLandingMotion }) => {
       if (cancelled) return;
@@ -40,11 +41,20 @@ export default function App() {
     .catch((error) => {
       console.error('[NASIB +62] Button previews failed to initialize; controls remain usable.', error);
     });
+  import('./animation/game-motion.js')
+    .then(({ initGameMotion }) => {
+      if (cancelled) return;
+      stopGameMotion = initGameMotion();
+    })
+    .catch((error) => {
+      console.error('[NASIB +62] Gameplay motion failed to initialize; controls remain usable.', error);
+    });
 
   return () => {
     cancelled = true;
     stopMotion();
     stopDashboardPreview();
+    stopGameMotion();
   };
  }, []);
  return <><LegacyFragment html={SharedMarkup} name="shared"/><LegacyFragment html={LandingMarkup} name="landing"/><LegacyFragment html={GameRoomMarkup} name="game-room"/><LegacyFragment html={ModalsMarkup} name="modals"/><LegacyFragment html={GuidebookMarkup} name="guidebook"/><SoundDock/><OnlineLobby/>{introVisible && <Suspense fallback={<div className="nasib-intro intro-loading" role="status"><span>NASIB <b>+62</b></span></div>}><IntroOverlay onComplete={() => setIntroVisible(false)} /></Suspense>}</>;
