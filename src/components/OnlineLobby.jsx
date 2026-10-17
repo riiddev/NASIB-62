@@ -25,6 +25,7 @@ export default function OnlineLobby() {
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState('');
   const [chatText, setChatText] = useState('');
+  const [chatExpanded, setChatExpanded] = useState(false);
   const roomRef = useRef(null);
   const chatListRef = useRef(null);
   const visibleRef = useRef(false);
@@ -151,8 +152,8 @@ export default function OnlineLobby() {
 
     {session.connected && session.started && <aside className="online-game-dock" aria-label="Panel mabar online">
       <div className="online-game-head"><span className="online-led"/><strong>MABAR ONLINE</strong><span className="online-code-small">{session.code}</span></div>
-      <div className="online-game-buttons"><button className="online-mini-btn" type="button" onClick={() => { setVisible(true); setNotice(''); }}>Pemain ({session.roster.length}/4)</button><button className="online-mini-btn" type="button" onClick={() => void copyCode()}>Salin kode</button><button className="online-mini-btn" type="button" onClick={() => void disconnectRoom()}>Keluar</button></div>
-      <div className="online-chat"><div className="online-chat-list" ref={chatListRef} aria-live="polite">{session.messages.length ? session.messages.map((message) => <div className="online-chat-message" key={message.id}><b>{message.name}</b>{message.text}<span style={{ float: 'right', color: 'rgba(255,255,255,.38)', fontSize: 9 }}>{localTime(message.time)}</span></div>) : <p className="online-chat-message" style={{ color: 'rgba(255,255,255,.5)' }}>Chat room kosong. Ajak temanmu ngobrol sambil bermain.</p>}</div><form className="online-chat-form" onSubmit={sendChat}><input maxLength={240} value={chatText} onChange={(event) => setChatText(event.target.value)} aria-label="Pesan chat" placeholder="Tulis pesan…"/><button type="submit" disabled={!chatText.trim()}>Kirim</button></form></div>
+      <div className="online-game-buttons"><button className="online-mini-btn" type="button" onClick={() => { setVisible(true); setNotice(''); }}>Pemain ({session.roster.length}/4)</button><button className="online-mini-btn online-chat-toggle" type="button" aria-expanded={chatExpanded} onClick={() => setChatExpanded((open) => !open)}>{chatExpanded ? 'Tutup chat' : `Chat${session.messages.length ? ` (${session.messages.length})` : ''} `}</button><button className="online-mini-btn" type="button" onClick={() => void copyCode()}>Salin kode</button><button className="online-mini-btn" type="button" onClick={() => void disconnectRoom()}>Keluar</button></div>
+      <div className={'online-chat' + (chatExpanded ? ' online-chat-expanded' : '')}><div className="online-chat-list" ref={chatListRef} aria-live="polite">{session.messages.length ? session.messages.map((message) => <div className="online-chat-message" key={message.id}><b>{message.name}</b>{message.text}<span style={{ float: 'right', color: 'rgba(255,255,255,.38)', fontSize: 9 }}>{localTime(message.time)}</span></div>) : <p className="online-chat-message" style={{ color: 'rgba(255,255,255,.5)' }}>Chat room kosong. Ajak temanmu ngobrol sambil bermain.</p>}</div><form className="online-chat-form" onSubmit={sendChat}><input maxLength={240} value={chatText} onChange={(event) => setChatText(event.target.value)} aria-label="Pesan chat" placeholder="Tulis pesan…"/><button type="submit" disabled={!chatText.trim()}>Kirim</button></form></div>
       {session.status && <p style={{ padding: '0 12px 10px', margin: 0, color: 'rgba(255,255,255,.5)', fontSize: 10 }}>{session.status}</p>}
     </aside>}
   </>;
